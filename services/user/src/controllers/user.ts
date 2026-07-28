@@ -1,4 +1,6 @@
+import axios from "axios";
 import { AuthenticatedRequest } from "../middleware/auth.js";
+import getBuffer from "../utils/buffers.js";
 import { sql } from "../utils/db.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
@@ -74,4 +76,103 @@ export const updateUserProfile = TryCatch(async(req:AuthenticatedRequest, res) =
         updatedUser,
         
     })
+})
+
+
+export const updateProfilePic = TryCatch(async(req:AuthenticatedRequest, res) => {
+
+    const user = req.user;
+    if(!user){
+        throw new ErrorHandler(401, "Authentication Required");
+    }
+
+    const file = req.file;
+
+    if(!file){
+        throw new ErrorHandler(400, "No image file provided");
+    }
+
+    const oldPublicId = user.profile_pic_public_id;
+
+    const fileBuffer = getBuffer(file);
+
+    if(!fileBuffer || !fileBuffer.content){
+        throw new ErrorHandler(500, "Failed to generate buffer");
+    }
+
+
+    if(!process.env.UPLOAD_SERVICE){
+        throw new ErrorHandler(500, "Upload service is not configured");
+    }
+
+    let uploadResult: {url: string; public_id: string};
+
+    try {
+        const response = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, {buffer:fileBuffer.content, public_id:oldPublicId}, { timeout: 20000 });
+        uploadResult = response.data;
+    } catch (error: any) {
+        const message = error?.response?.data?.message || error?.message || "Failed to upload profile image";
+        throw new ErrorHandler(502, message);
+    }
+
+    const [updatedUser] = await sql`
+    UPDATE users SET profile_pic = ${uploadResult.url}, profile_pic_public_id = ${uploadResult.public_id}
+    WHERE user_id = ${user.user_id}
+    RETURNING user_id, name, profile_pic;
+    `;
+
+    res.json({
+        message:"Profile pic Updated",
+        updatedUser
+    })
+
+})
+
+export const updateResume = TryCatch(async(req:AuthenticatedRequest, res) => {
+
+    const user = req.user;
+    if(!user){
+        throw new ErrorHandler(401, "Authentication Required");
+    }
+
+    const file = req.file;
+
+    if(!file){
+        throw new ErrorHandler(400, "No pdf file provided");
+    }
+
+    const oldPublicId = user.resume_public_id;
+
+    const fileBuffer = getBuffer(file);
+
+    if(!fileBuffer || !fileBuffer.content){
+        throw new ErrorHandler(500, "Failed to generate buffer");
+    }
+
+
+    if(!process.env.UPLOAD_SERVICE){
+        throw new ErrorHandler(500, "Upload service is not configured");
+    }
+
+    let uploadResult: {url: string; public_id: string};
+
+    try {
+        const response = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, {buffer:fileBuffer.content, public_id:oldPublicId}, { timeout: 20000 });
+        uploadResult = response.data;
+    } catch (error: any) {
+        const message = error?.response?.data?.message || error?.message || "Failed to upload profile image";
+        throw new ErrorHandler(502, message);
+    }
+
+    const [updatedUser] = await sql`
+    UPDATE users SET resume = ${uploadResult.url}, resume_public_id = ${uploadResult.public_id}
+    WHERE user_id = ${user.user_id}
+    RETURNING user_id, name, resume;
+    `;
+
+    res.json({
+        message:"Resume Updated",
+        updatedUser
+    })
+
 })
