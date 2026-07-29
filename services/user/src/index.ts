@@ -13,7 +13,10 @@ app.use(express.json());
 const port = Number(process.env.PORT ?? 4002);
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok' });
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  res.json({ status: 'ok', serverTime: new Date().toISOString() });
 });
 
 app.use("/api/user", userRoutes);
