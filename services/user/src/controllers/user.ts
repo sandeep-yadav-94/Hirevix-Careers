@@ -317,4 +317,3 @@ export const deleteSkillFromUser = TryCatch(async(req:AuthenticatedRequest, res)
 
 })
 
-  
