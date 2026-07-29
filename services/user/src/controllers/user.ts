@@ -176,3 +176,95 @@ export const updateResume = TryCatch(async(req:AuthenticatedRequest, res) => {
     })
 
 })
+
+export const addSkillToUser = TryCatch(async(req:AuthenticatedRequest, res) =>{
+
+    const userId = req.user?.user_id;
+    const {skillName} = req.body;
+
+    if(!skillName || skillName.trim() === ""){
+        throw new ErrorHandler(400, "Please provide a skill name");
+    }
+
+    let wasSkillAdded = false;
+
+    try {
+        await sql`BEGIN`;
+        const users = await sql`SELECT user_id FROM users WHERE user_id = ${userId}`;
+        if(users.length === 0){
+            throw new ErrorHandler(404, "User not found");
+        }
+        const existingSkill = await sql`SELECT skill_id FROM skills WHERE LOWER(name) = LOWER(${skillName.trim()}) LIMIT 1`;
+        let skillId: number;
+
+        if(existingSkill.length > 0){
+            skillId = existingSkill[0].skill_id;
+        } else {
+            try {
+                const [newSkill] = await sql`INSERT INTO skills (name) VALUES (${skillName.trim()}) RETURNING skill_id`;
+                skillId = newSkill.skill_id;
+            } catch (error: any) {
+                if(error?.code === '23505' || error?.message?.includes('duplicate')){
+                    const [duplicateSkill] = await sql`SELECT skill_id FROM skills WHERE LOWER(name) = LOWER(${skillName.trim()}) LIMIT 1`;
+                    if(!duplicateSkill){
+                        throw error;
+                    }
+                    skillId = duplicateSkill.skill_id;
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        const insertionResult = await sql`INSERT INTO user_skills (user_id, skill_id) VALUES (${userId}, ${skillId}) ON CONFLICT (user_id, skill_id) DO NOTHING RETURNING user_id`;
+        if(insertionResult.length > 0){
+            wasSkillAdded = true;
+        }
+        await sql`COMMIT`;
+    } catch (error: any) {
+        await sql`ROLLBACK`;
+        if(error instanceof ErrorHandler){
+            throw error;
+        }
+        throw new ErrorHandler(500, error?.message || "Failed to add skill");
+    }
+
+    if(!wasSkillAdded){
+        return res.status(200).json({
+            message:"User Already possesses this skill",
+        })
+    }
+
+    res.json({
+        message:`Skill ${skillName.trim()} is added successfull`,
+    })
+
+})
+
+
+
+export const deleteSkillFromUser = TryCatch(async(req:AuthenticatedRequest, res) =>{
+
+    const user = req.user;
+
+    if(!user){
+        throw new ErrorHandler(401, "Authentication required");
+    }
+
+    const {skillName} = req.body;
+
+    if(!skillName || skillName.trim() === ""){
+        throw new ErrorHandler(400, "Please provide a skill name");
+    }
+
+    const result = await sql`DELETE FROM user_skills WHERE user_id = ${user.user_id} AND skill_id = (SELECT skill_id FROM skills WHERE name = ${skillName.trim()}) RETURNING user_id`;
+
+    if(result.length === 0){
+        throw new ErrorHandler(404, `skill ${skillName.trim()} was not found`);
+    } 
+
+    res.json({
+        message:`Skill ${skillName.trim()} successfully deleted`
+    })
+
+})
