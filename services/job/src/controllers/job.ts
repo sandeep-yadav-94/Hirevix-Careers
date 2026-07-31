@@ -264,4 +264,77 @@ export const getSingleJob = TryCatch(async(req, res) => {
     res.json(job);
 })
 
+export const getAllApplicationForJob = TryCatch(async(req:AuthenticatedRequest, res) => {
+
+    const user = req.user;
+
+    if(!user){
+        throw new ErrorHandler(401, "Authentication required");
+    }
+
+    if(user.role != "recruiter"){
+        throw new ErrorHandler(403, "Forbidden: Only recruiter can access this route");
+    }
+
+    const  {jobId} = req.params;
+
+    const [job] = await sql`SELECT posted_by_recruiter_id FROM jobs WHERE job_id = ${jobId}`;
+
+    if(!job){
+        throw new ErrorHandler(404, "job not found");
+    }
+
+    if(job.posted_by_recruiter_id !== user.user_id){
+        throw new ErrorHandler(403, "Forbidden: You are not allowed");
+    }
+
+    const applications = await sql`SELECT * FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
+
+    res.json(applications);
+
+
+})
+
+
+
+export const updateApplication = TryCatch(async(req:AuthenticatedRequest, res) => {
+
+    const user = req.user;
+
+    if(!user){
+        throw new ErrorHandler(401, "Authentication required");
+    }
+
+    if(user.role != "recruiter"){
+        throw new ErrorHandler(403, "Forbidden: Only recruiter can access this route");
+    }
+
+    const {id} = req.params;
+
+    const [application] = await sql`SELECT * FROM applications WHERE application_id = ${id}`;
+
+    if(!application){
+        throw new ErrorHandler(404, "Application not found");
+    }
+
+    const [job] = await sql`SELECT posted_by_recruiter_id, title FROM jobs WHERE job_id = ${application.job_id}`;
+
+    if(!job){
+        throw new ErrorHandler(404, "no job with this id");
+    }
+
+    if(job.posted_by_recruiter_id !== user.user_id){
+        throw new ErrorHandler(403, "Forbidden: You are not allowed");
+    }
+
+    const [updatedApplication] = await sql`UPDATE applications SET status = ${req.body.status} WHERE application_id = ${id} RETURNING *`;
+
+    res.json({
+        message: "Application Updated successfully",
+        updatedApplication
+    })
+
+
+})
+
 
