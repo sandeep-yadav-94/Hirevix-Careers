@@ -333,8 +333,7 @@ export const updateApplication = TryCatch(async(req:AuthenticatedRequest, res) =
         message: "Application Updated successfully",
         updatedApplication
     })
-
-
+    
 })
 
 
