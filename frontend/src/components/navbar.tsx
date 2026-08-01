@@ -3,9 +3,10 @@
 import Link from "next/link";
 import React, { useState } from 'react'
 import { Button } from "./ui/button";
-import { Briefcase, Ghost, Home, Info, LogOut, User, UserIcon } from "lucide-react";
+import { Briefcase, Ghost, Home, Info, LogOut, Menu, User, UserIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { ModeToggle } from "./mode-toggle";
 
 const NavBar = () => {
 
@@ -15,7 +16,7 @@ const NavBar = () => {
         setIsOpen(!isOpen);
     };
 
-    const isAuth = false;
+    const isAuth = true; 
 
     const logoutHandler = () => { };
 
@@ -34,16 +35,16 @@ const NavBar = () => {
                 {/* desktop navigation */}
                 <div className="hidden md:flex items-center space-x-1 ">
 
-                    <Link href={'/'} >
-                        <Button variant={"ghost"} className="flex items-center gap-2 font-medium "><Home size={16} /> Home</Button>
+                    <Link href={'/'} className="inline-flex items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                        <Home size={16} /> Home
                     </Link>
 
-                    <Link href={'/jobs'} >
-                        <Button variant={"ghost"} className="flex items-center gap-2 font-medium "><Briefcase size={16} /> Jobs</Button>
+                    <Link href={'/jobs'} className="inline-flex items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                        <Briefcase size={16} /> Jobs
                     </Link>
 
-                    <Link href={'/about'} >
-                        <Button variant={"ghost"} className="flex items-center gap-2 font-medium "><Info size={16} /> About</Button>
+                    <Link href={'/about'} className="inline-flex items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                        <Info size={16} /> About
                     </Link>
                 </div>
 
@@ -52,15 +53,13 @@ const NavBar = () => {
                     {isAuth ? (
 
                         <Popover>
-                            <PopoverTrigger>
-                                <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                                    <Avatar className="h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-blue-500/20 cursor-pointer hover:ring-blue-500/40 transition-all">
-                                    {/* <AvatarImage src={} alt="" /> */}
-                                    <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600">
-                                        S
-                                    </AvatarFallback>
-                                    </Avatar>
-                                </button>
+                            <PopoverTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                                <Avatar className="h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-blue-500/20 cursor-pointer hover:ring-blue-500/40 transition-all">
+                                {/* <AvatarImage src={} alt="" /> */}
+                                <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600">
+                                    S
+                                </AvatarFallback>
+                                </Avatar>
                             </PopoverTrigger>
 
                             <PopoverContent className="w-56 p-2" align="end">
@@ -68,21 +67,70 @@ const NavBar = () => {
                                     <p className="text-sm font-semibold ">Sandeep</p>
                                     <p className="text-xs opacity-60 truncate">sandeep@gmail.com</p>
                                 </div>
-                                <Link href={'/account'} >
-                                 <Button className="w-full justify-start gap-2" variant={"ghost"}><User size={15}/>My Profile</Button> 
+                                <Link href={'/account'} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                                    <User size={15}/>My Profile
                                 </Link>
                                 <Button className="w-full justify-start gap-2 mt-1" variant={"ghost"} onClick={logoutHandler}><LogOut size={16}/>Logout</Button>
                             </PopoverContent>
                         </Popover>
 
                         
-                        ) : (<Link href={'/login'}><Button className="gap-2"><UserIcon size={16} />Sign In</Button></Link>)}
+                        ) : (
+                            <Link href={'/login'} className="inline-flex items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                                <UserIcon size={16} />
+                                Sign In
+                            </Link>
+                        )}
+                        <ModeToggle/>
                 </div>
-
+               {/* mobile menu butto  */}
+                <div className="md:hidden flex items-center gap-2">
+                    <ModeToggle/>
+                    <button onClick={toggleMenu} className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-label="Toggle menu">
+                        {isOpen ? (<X size={20} />) : (<Menu size={20} />)}
+                        <span className="sr-only">Open main menu</span>
+                    </button>
+                </div>
 
 
             </div>
         </div>
+
+        {/* mobile view */}
+
+        <div className={`md:hidden border-t overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-screen' : 'max-h-0'}`}>
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                {/* isAuth or user */}
+                <Link href={'/'} onClick={toggleMenu} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                    <Home size={16} /> Home
+                </Link> 
+                <Link href={'/jobs'} onClick={toggleMenu} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                    <Briefcase size={16} /> Jobs
+                </Link>
+                <Link href={'/about'} onClick={toggleMenu} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                    <Info size={16} /> About
+                </Link>
+
+                {
+                    isAuth ? (
+                        <>
+                        <Link href={'/account'} onClick={toggleMenu} className="inline-flex w-full items-center justify-start gap-3 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+                            <User size={18} /> My Profile
+                        </Link>
+                        <Button variant={"destructive"} className="w-full justify-start gap-3 h-11" onClick={() => {logoutHandler(); toggleMenu()}}>
+                            <LogOut size={18} /> LogOut
+                        </Button>
+                        </>
+                    ) : (
+                        <Link href={'/login'} onClick={toggleMenu} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted h-11">
+                            <UserIcon size={18} /> Sign In
+                        </Link>
+                    )
+                }
+               
+            </div>
+        </div>
+
     </nav>
 
 }
