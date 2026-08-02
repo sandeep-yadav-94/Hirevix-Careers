@@ -27,4 +27,26 @@ export interface CareerGuideResponse {
     learningApproach: LearningApproach,
 }
 
+export interface ScoreBreakdown{
+    formatting:{score: number; feedback: string};
+    keywords:{score: number; feedback: string};
+    structure:{score: number; feedback: string};
+    readability:{score: number; feedback: string};
+}
+
+export interface Suggestion {
+    category: string;
+    issue: string;
+    recommendation: string;
+    priority: "high" | "medium" | "low";
+}
+
+export interface ResumeAnalysisResponse {
+    atsScore: number;
+    scoreBreakdown: ScoreBreakdown;
+    suggestions:Suggestion[];
+    strengths: string[];
+    summary:string;
+}
+
 export const utils_service = "http://localhost:4001";
