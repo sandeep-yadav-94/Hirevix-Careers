@@ -23,6 +23,7 @@ Zap,
 import axios from "axios";
 import { ResumeAnalysisResponse } from "@/type";
 import { utils_service } from '@/context/AppContext'
+import toast from "react-hot-toast";
 
 // import toast from "react-hot-toast";
 const ResumeAnalyzer = () => {
@@ -36,12 +37,12 @@ const selectedFile = e.target.files?.[0];
 if (selectedFile) {
 if (selectedFile.type !== "application/pdf") {
 // toast.error("Please upload a PDF file");
-alert("Please upload a PDF file");
+toast.error("Please upload a PDF file");
 return;
 }
 if (selectedFile.size > 5 * 1024 * 1024) {
 // toast.error("File size should be less than 5MB");
-alert("File size should be less than 5MB");
+toast.error("File size should be less than 5MB");
 return;
 }
 setFile(selectedFile);
@@ -58,8 +59,7 @@ reader.onerror = (error) => reject(error);
 };
 const analyzeResume = async () => {
 if (!file) {
-// toast.error("Please upload a resume");
-alert("Please upload a resume");
+toast.error("Please upload a resume");
 return;
 }
 setLoading(true);
@@ -72,11 +72,11 @@ pdfBase64: base64,
 }
 );
 setResponse(data);
-// toast.success("Resume analyzed successfully!");
-alert("Resume analyzed successfully!");
+toast.success("Resume analyzed successfully!");
+
 } catch (error: any) {
-// toast.error(error.response?.data?.message || "Failed to analyze resume");
-alert(error.response?.data?.message || "Failed to analyze resume");
+toast.error(error.response?.data?.message || "Failed to analyze resume");
+
 console.log(error);
 } finally {
 setLoading(false);

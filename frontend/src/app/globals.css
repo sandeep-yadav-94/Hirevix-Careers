@@ -127,3 +127,7 @@
     @apply font-sans;
     }
 }
+
+.icon-style{
+  @apply absolute left-3 top-1/2 -translate-1/2 h-5 opacity-50;
+}

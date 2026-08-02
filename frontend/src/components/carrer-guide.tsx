@@ -9,6 +9,7 @@ import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { utils_service } from '@/context/AppContext'
+import toast from 'react-hot-toast'
 
 const CarrerGuide = () => {
 
@@ -38,16 +39,16 @@ const CarrerGuide = () => {
 
     const getCarrerGuide = async () => {
         if (skills.length === 0) {
-            alert("Please add at least one skill.");
+            toast.error("Please add at least one skill.");
             return;
         }
         setLoading(true);
         try {
             const { data } = await axios.post(`${utils_service}/api/utils/career`, { skills: skills });
             setResponse(data);
-            alert("Career guide generated successfully!");
+            toast.success("Career guide generated successfully!");
         } catch (error) {
-            alert("Failed to generate career guide.");
+            toast.error("Failed to generate career guide.");
         } finally {
             setLoading(false);
         }

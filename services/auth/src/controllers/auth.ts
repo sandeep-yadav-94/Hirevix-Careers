@@ -123,7 +123,8 @@ GROUP BY u.user_id;
   const token = jwt.sign({ id: userObject?.user_id }, jwtSecret, { expiresIn: "15d" })
 
   res.json({
-    message: "User registered logged in",
+    message: "User logged in successfully",
+    user: userObject,
     userObject,
     token
   })

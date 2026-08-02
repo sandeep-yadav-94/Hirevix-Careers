@@ -9,6 +9,8 @@ dotenv.config({
 import app from './app.js';
 import { sql } from './utils/db.js';
 
+const port = Number(process.env.PORT ?? 4000);
+
 async function initDb() {
     try {
         await sql`
@@ -40,6 +42,13 @@ async function initDb() {
         `;
 
         await sql`
+        CREATE TABLE IF NOT EXISTS skills (
+            skill_id SERIAL PRIMARY KEY,
+            name VARCHAR(255) NOT NULL UNIQUE
+        )
+        `;
+
+        await sql`
         CREATE TABLE IF NOT EXISTS user_skills (
             user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
             skill_id INT NOT NULL REFERENCES skills(skill_id) ON DELETE CASCADE,
@@ -57,8 +66,8 @@ async function initDb() {
 
 
 initDb().then(() => {
-     app.listen(process.env.PORT, () => {
-        console.log(`🚀 Server is running on port ${process.env.PORT}`);
+     app.listen(port, () => {
+        console.log(`🚀 Server is running on port ${port}`);
     });
    
 })
