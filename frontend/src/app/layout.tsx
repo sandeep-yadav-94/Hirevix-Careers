@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import NavBar from "@/components/navbar";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppProvider } from "@/context/AppContext";
 
 
 
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-         <ThemeProvider
+
+        <AppProvider>
+           <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
@@ -27,6 +30,7 @@ export default function RootLayout({
             <NavBar />
             {children}
           </ThemeProvider>
+        </AppProvider>
         
       </body>
     </html>
