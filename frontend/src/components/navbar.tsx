@@ -7,18 +7,23 @@ import { Briefcase, Ghost, Home, Info, LogOut, Menu, User, UserIcon, X } from "l
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
+import { useAppData } from "@/context/AppContext";
 
 const NavBar = () => {
 
     const [isOpen, setIsOpen] = useState(false);
 
+    const {isAuth, user, setIsAuth, setUser, loading, logoutUser} = useAppData();
+
     const toggleMenu = () => {
         setIsOpen(!isOpen);
     };
 
-    const isAuth = true; 
 
-    const logoutHandler = () => { };
+
+    const logoutHandler = () => { 
+        logoutUser();
+    };
 
     return <nav className='z-50 sticky top-0 bg-background/80 border-b backdrop-blur-md shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
@@ -50,22 +55,23 @@ const NavBar = () => {
 
                 {/* Right side actions */}
                 <div className="hidden md:flex items-center gap-3">
-                    {isAuth ? (
+                    {
+                        loading ? "" : <>{isAuth ? (
 
                         <Popover>
                             <PopoverTrigger className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                                 <Avatar className="h-9 w-9 ring-2 ring-offset-2 ring-offset-background ring-blue-500/20 cursor-pointer hover:ring-blue-500/40 transition-all">
-                                {/* <AvatarImage src={} alt="" /> */}
+                                <AvatarImage src={user ? user.profile_pic as string : "" } alt={user ? user.name : ""} />
                                 <AvatarFallback className="bg-blue-100 dark:bg-blue-900 text-blue-600">
-                                    S
+                                    {user?.name?.charAt(0).toUpperCase() || "U"}
                                 </AvatarFallback>
                                 </Avatar>
                             </PopoverTrigger>
 
                             <PopoverContent className="w-56 p-2" align="end">
                                 <div className="px-3 py-2 mb-2 border-b">
-                                    <p className="text-sm font-semibold ">Sandeep</p>
-                                    <p className="text-xs opacity-60 truncate">sandeep@gmail.com</p>
+                                    <p className="text-sm font-semibold ">{user && user.name}</p>
+                                    <p className="text-xs opacity-60 truncate">{user && user.email}</p>
                                 </div>
                                 <Link href={'/account'} className="inline-flex w-full items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
                                     <User size={15}/>My Profile
@@ -76,11 +82,14 @@ const NavBar = () => {
 
                         
                         ) : (
-                            <Link href={'/login'} className="inline-flex items-center justify-start gap-2 rounded-lg px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
-                                <UserIcon size={16} />
-                                Sign In
+                            <Link href={'/login'} >
+                                <Button className="gap-2">
+                                    <User size={16} />
+                                    Sign In
+                                </Button>
                             </Link>
-                        )}
+                        )}</>
+                    }
                         <ModeToggle/>
                 </div>
                {/* mobile menu butto  */}

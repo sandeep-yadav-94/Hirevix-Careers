@@ -3,6 +3,6 @@
 > node dist/index.js
 
 ◇ injected env (5) from .env // tip: ⌘ override existing { override: true }
-◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+◇ injected env (0) from .env // tip: ⌘ custom filepath { path: '/custom/path/.env' }
 ✅ User service database initialized successfully
 User service is running on http://localhost:4002

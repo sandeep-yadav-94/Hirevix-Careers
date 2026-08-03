@@ -35,12 +35,21 @@ const LoginPage = () => {
         const userPayload = data?.user ?? data?.userObject ?? null;
 
         toast.success(data?.message || 'Signed in successfully');
-        Cookies.set("token" , data?.token || "", {
+        const token = data?.token;
+        if (!token) {
+          throw new Error("Login response did not include an authentication token.");
+        }
+
+        Cookies.set("token", token, {
           expires:15,
           secure: window.location.protocol === 'https:',
           sameSite:'lax',
           path:"/",
         })
+        window.localStorage.setItem("token", token);
+        if (userPayload) {
+          window.localStorage.setItem("auth_user", JSON.stringify(userPayload));
+        }
         setUser(userPayload);
         setIsAuth(true);
         router.push('/');

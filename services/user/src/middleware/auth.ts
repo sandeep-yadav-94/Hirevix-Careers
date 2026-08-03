@@ -44,7 +44,13 @@ Promise<void> => {
             return;
         }
 
-        const decodedPayload = jwt.verify(token, process.env.JWT_SEC as string) as JwtPayload;
+        const jwtSecret = process.env.JWT_SEC || process.env.JWT_SECRET;
+        if (!jwtSecret) {
+            res.status(500).json({ message: "JWT secret is not configured" });
+            return;
+        }
+
+        const decodedPayload = jwt.verify(token, jwtSecret) as JwtPayload;
 
         if(!decodedPayload || !decodedPayload.id){
             res.status(401).json({
