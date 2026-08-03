@@ -1,0 +1,8 @@
+
+> user@1.0.0 start
+> node dist/index.js
+
+◇ injected env (5) from .env // tip: ⌘ override existing { override: true }
+◇ injected env (0) from .env // tip: ⌘ suppress logs { quiet: true }
+✅ User service database initialized successfully
+User service is running on http://localhost:4002

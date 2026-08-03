@@ -24,7 +24,7 @@ import {
   useTransform,
 } from "framer-motion";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   LineChart,
   Line,
@@ -65,7 +65,6 @@ import {
   Activity,
   type LucideIcon,
 } from "lucide-react";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 
 function Linkedin(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -101,27 +100,7 @@ function Github(props: React.SVGProps<SVGSVGElement>) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/*  Fonts                                                              */
-/* ------------------------------------------------------------------ */
-
-const display = Space_Grotesk({
-  subsets: ["latin"],
-  weight: ["400", "500", "700"],
-  variable: "--font-display",
-});
-
-const body = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500", "600"],
-  variable: "--font-body",
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-mono",
-});
+gsap.registerPlugin(ScrollTrigger);
 
 /* ------------------------------------------------------------------ */
 /*  Deterministic pseudo-random (avoids hydration mismatches)          */
@@ -1172,8 +1151,6 @@ function ScrollProgress() {
 
 export default function AboutPage() {
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const ctx = gsap.context(() => {
       gsap.utils.toArray<HTMLElement>(".gsap-fade").forEach((el) => {
         gsap.fromTo(
@@ -1201,7 +1178,7 @@ export default function AboutPage() {
 
   return (
     <main
-      className={`${display.variable} ${body.variable} ${mono.variable} relative min-h-screen w-full bg-[#05060a] font-[family-name:var(--font-body)] text-white antialiased`}
+      className="relative min-h-screen w-full bg-[#05060a] font-sans text-white antialiased"
     >
       <style>{`
         @keyframes auroraDrift {

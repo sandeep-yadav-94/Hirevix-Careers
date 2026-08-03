@@ -1,0 +1,13 @@
+
+> frontend@0.1.0 dev
+> next dev --webpack
+
+▲ Next.js 16.2.12 (webpack)
+- Local:         http://localhost:3000
+- Network:       http://172.26.162.126:3000
+✓ Ready in 1090ms
+
+○ Compiling / ...
+ GET / 200 in 11.4s (next.js: 11.0s, application-code: 485ms)
+[?25h
+h

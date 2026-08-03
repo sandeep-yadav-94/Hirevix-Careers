@@ -1,0 +1,8 @@
+
+> auth@1.0.0 start
+> node dist/index.js
+
+◇ injected env (5) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+◇ injected env (0) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+✅ Database initialized successfully
+🚀 Server is running on port 4000

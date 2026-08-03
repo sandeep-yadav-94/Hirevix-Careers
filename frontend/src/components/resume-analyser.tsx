@@ -131,13 +131,13 @@ Get instant feedback on your resume's compatibility with Applicant
 Tracking Systems
 </p>
 <Dialog open={open} onOpenChange={setOpen}>
-<DialogTrigger render={
+<DialogTrigger>
   <Button size="lg" className="gap-2 h-12 px-8">
     <FileText size={18} />
     Analyze My Resume
     <ArrowRight size={18} />
   </Button>
-} />
+</DialogTrigger>
 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
 {!response ? (
 <>

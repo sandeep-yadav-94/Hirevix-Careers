@@ -1,0 +1,8 @@
+
+> job@1.0.0 start
+> node dist/index.js
+
+◇ injected env (5) from .env // tip: ◈ encrypted .env [www.dotenvx.com]
+◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+Job service Database tables checked and created successfully
+Job service is runing on http://localhost:4003

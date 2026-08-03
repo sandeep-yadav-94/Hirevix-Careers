@@ -74,15 +74,13 @@ const CarrerGuide = () => {
             </p>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger
-                    render={
-                        <Button size={'lg'} className=' px-8 h-12 gap-2'>
-                            <Sparkles size={18} />
-                            Get Career Guidence
-                            <ArrowRight size={18} />
-                        </Button>
-                    }
-                />
+                <DialogTrigger>
+                    <Button size={'lg'} className=' px-8 h-12 gap-2'>
+                        <Sparkles size={18} />
+                        Get Career Guidence
+                        <ArrowRight size={18} />
+                    </Button>
+                </DialogTrigger>
                 <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
                     {
                         !response ? <>

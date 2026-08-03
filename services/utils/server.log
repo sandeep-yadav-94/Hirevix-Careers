@@ -1,0 +1,7 @@
+
+> utils@1.0.0 start
+> node dist/index.js
+
+◇ injected env (5) from .env // tip: ⌘ suppress logs { quiet: true }
+◇ injected env (0) from .env // tip: ⌘ multiple files { path: ['.env.local', '.env'] }
+utils services is running on http://localhost:4001
