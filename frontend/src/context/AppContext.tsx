@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import toast, {Toaster} from 'react-hot-toast'
 import Cookies from "js-cookie";
 import axios from "axios";
+import { headers } from "next/headers";
 
 interface User {
     user_id: number;
@@ -29,6 +30,8 @@ interface AppContextType {
     setLoading: React.Dispatch<React.SetStateAction<boolean>>;
     setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
     logoutUser: () => Promise<void>;
+   updateProfilePic: (FormData:any) => Promise<void>
+   updateResume: (FormData:any) => Promise<void>
 
 }
 
@@ -87,6 +90,52 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) =>{
     }
 
 
+async function updateProfilePic(formData:any) {
+    setLoading(true);
+    const token = window.localStorage.getItem("token") || Cookies.get("token");
+
+    try {
+        const {data} = await axios.put(`${user_service}/api/user/update/pic`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        toast.success(data.message);
+        fetchUser();
+
+    } catch (error:any) {
+        toast.error(error?.response?.data?.message || "Failed to update profile picture");
+        throw error;
+    }finally{
+        setLoading(false);
+    }
+}
+
+
+async function updateResume(formData:any) {
+    setLoading(true);
+    const token = window.localStorage.getItem("token") || Cookies.get("token");
+
+    try {
+        const {data} = await axios.put(`${user_service}/api/user/update/resume`, formData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        toast.success(data.message);
+        fetchUser();
+
+    } catch (error:any) {
+        toast.error(error?.response?.data?.message || "Failed to update profile picture");
+        throw error;
+    }finally{
+        setLoading(false);
+    }
+}
+
+
   async function logoutUser(){
         // Remove every persisted client-side credential/profile so a reload
         // cannot restore the previously authenticated user.
@@ -116,7 +165,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({children}) =>{
         fetchUser();
     }, [])
 
-    return <AppContext.Provider value={{user, loading, btnLoading, setUser, isAuth, setIsAuth, setLoading, logoutUser}}>
+    return <AppContext.Provider value={{user, loading, btnLoading, setUser, isAuth, setIsAuth, setLoading, logoutUser, updateProfilePic, updateResume}}>
         {children}
         <Toaster/>
         </AppContext.Provider>

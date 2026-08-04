@@ -5,6 +5,9 @@ import { sql } from "../utils/db.js";
 import ErrorHandler from "../utils/errorHandler.js";
 import { TryCatch } from "../utils/TryCatch.js";
 import { application } from "express";
+import dotenv from 'dotenv'
+
+dotenv.config();
 
 const getFreshUserProfile = async(userId: number) => {
     const users = await Promise.race([
@@ -147,6 +150,8 @@ export const updateProfilePic = TryCatch(async(req:AuthenticatedRequest, res) =>
     }
 
     let uploadResult: {url: string; public_id: string};
+
+    console.log("UPLOAD_SERVICE =", process.env.UPLOAD_SERVICE);
 
     try {
         const response = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, {buffer:fileBuffer.content, public_id:oldPublicId}, { timeout: 20000 });

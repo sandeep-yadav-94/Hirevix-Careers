@@ -30,6 +30,15 @@ export default function RootLayout({
             <NavBar />
             {children}
           </ThemeProvider>
+
+
+
+
+
+
+
+
+          
         </AppProvider>
         
       </body>
