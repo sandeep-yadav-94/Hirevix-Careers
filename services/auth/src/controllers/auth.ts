@@ -27,7 +27,8 @@ const registerUser = TryCatch(async (req, res, next) => {
     const [user] = await sql`INSERT INTO users (name, email, password, phone_number, role) VALUES (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}) RETURNING user_id, name, email, phone_number, role, created_at`;
     registerdUser = user;
   } else if (role === "jobseeker") {
-    const file = req.file;
+    const uploadedFiles = req.files as Record<string, Express.Multer.File[]> | undefined;
+    const file = uploadedFiles?.File?.[0] ?? uploadedFiles?.file?.[0] ?? uploadedFiles?.resume?.[0] ?? null;
 
     if (!file) {
       throw new ErrorHandler(400, "Resume file is required for job seekers...")

@@ -1,5 +1,5 @@
 "use client";
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useEffect, useState } from 'react'
 import { auth_service, useAppData } from '@/context/AppContext';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -10,6 +10,7 @@ import { ArrowRight, Lock, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import Loading from '@/components/loading';
 
 
 const LoginPage = () => {
@@ -18,13 +19,16 @@ const LoginPage = () => {
     const[password, setPassword] = useState("")
     const [btnLoading, setBtnLoading] = useState(false)
 
-    const {isAuth, setUser, setIsAuth} = useAppData();
+    const {isAuth, setUser, loading, setIsAuth} = useAppData();
     const router = useRouter();
 
-    if(isAuth) {
-      router.replace('/');
-      return null;
-    }
+    useEffect(() => {
+      if (isAuth) {
+        router.replace('/');
+      }
+    }, [isAuth, router]);
+
+    if(loading) return <Loading/>
 
     const submitHandler = async(e:FormEvent<HTMLFormElement>)=>{
       e.preventDefault();
@@ -32,7 +36,7 @@ const LoginPage = () => {
 
       try {
         const {data} = await axios.post(`${auth_service}/api/auth/login`, {email, password});
-        const userPayload = data?.user ?? data?.userObject ?? null;
+        const userPayload = data?.user ?? data?.userObject ?? data?.registerdUser ?? data?.registeredUser ?? null;
 
         toast.success(data?.message || 'Signed in successfully');
         const token = data?.token;
