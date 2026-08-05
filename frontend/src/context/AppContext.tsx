@@ -32,6 +32,9 @@ interface AppContextType {
     logoutUser: () => Promise<void>;
    updateProfilePic: (FormData:any) => Promise<void>
    updateResume: (FormData:any) => Promise<void>
+   updateUser: (name:string, phoneNumber:string, bio:string) => Promise<void>
+   addSkill: (skill:string) => Promise<void>
+   removeSkill:(skill:string) => Promise<void>
 
 }
 
@@ -135,6 +138,24 @@ async function updateResume(formData:any) {
     }
 }
 
+async function updateUser(name:string, phoneNumber:string, bio:string) {
+    setBtnLoading(true);
+    const token = window.localStorage.getItem("token") || Cookies.get("token");
+    try {
+        const {data} = await axios.put(`${user_service}/api/user/update/profile`, {name, phoneNumber, bio}, {
+            headers:{
+                Authorization: `Bearer ${token}`,
+            },
+        })
+        toast.success(data.message);
+        fetchUser();
+    } catch (error:any) {
+        toast.error(error.response.data.message);
+    }finally{
+        setBtnLoading(false);
+    }
+}
+
 
   async function logoutUser(){
         // Remove every persisted client-side credential/profile so a reload
@@ -148,6 +169,42 @@ async function updateResume(formData:any) {
         setLoading(false);
         toast.success("Logged out successfully..")
     }
+
+    async function addSkill(skill:string) {
+        setBtnLoading(true)
+        const token = window.localStorage.getItem("token") || Cookies.get("token");
+        try {
+            const {data} = await axios.post(`${user_service}/api/user/skill/add`, {skillName:skill}, {
+                headers:{
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            toast.success(data.message);
+            fetchUser();
+        } catch (error:any) {
+            toast.error(error.response.data.message);
+        }finally{
+            setBtnLoading(false);
+        }
+    }
+
+
+     async function removeSkill(skill:string) {
+        
+        const token = window.localStorage.getItem("token") || Cookies.get("token");
+        try {
+            const {data} = await axios.put(`${user_service}/api/user/skill/delete`, {skillName:skill}, {
+                headers:{
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            toast.success(data.message);
+            fetchUser();
+        } catch (error:any) {
+            toast.error(error.response.data.message);
+        }
+    }
+
 
     useEffect(() => {
         const cachedUser = window.localStorage.getItem("auth_user");
@@ -165,7 +222,7 @@ async function updateResume(formData:any) {
         fetchUser();
     }, [])
 
-    return <AppContext.Provider value={{user, loading, btnLoading, setUser, isAuth, setIsAuth, setLoading, logoutUser, updateProfilePic, updateResume}}>
+    return <AppContext.Provider value={{user, loading, btnLoading, setUser, isAuth, setIsAuth, setLoading, logoutUser, updateProfilePic, updateResume, updateUser, addSkill, removeSkill}}>
         {children}
         <Toaster/>
         </AppContext.Provider>
