@@ -6,7 +6,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import Loading from '@/components/loading';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
-import { Building2, Plus, Trash2, UploadCloud, Eye } from 'lucide-react';
+import { Building2, Plus, Trash2, UploadCloud, Eye, ArrowUpRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Company as CompanyType } from '@/type';
 import {
@@ -58,7 +58,6 @@ const Company = () => {
             );
 
             setCompanies(data);
-            console.log(data);
         } catch (error) {
             console.error(error);
         }
@@ -160,240 +159,130 @@ const Company = () => {
     if (loading) return <Loading />
 
     return (
-        <div className="max-w-7xl mx-auto px-4 py-6">
-            <Card className="shadow-lg border-2 overflow-hidden">
-
-                {/* Header */}
-                <div className="bg-blue-500 p-6">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-
+        <div className="mx-auto max-w-7xl px-4 py-2">
+            <Card className="overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_80px_-30px_rgba(2,6,23,0.2)]">
+                <div className="border-b border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#f8fbff_100%)] p-6 sm:p-8">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div className="flex items-center gap-3">
-                            <div className="h-12 w-12 rounded-xl bg-white/20 flex items-center justify-center">
-                                <Building2 className="text-white" size={25} />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
+                                <Building2 size={24} />
                             </div>
-
                             <div>
-                                <CardTitle className="text-2xl text-white">
-                                    My Companies
-                                </CardTitle>
-
-                                <CardDescription className="text-blue-100 mt-1">
-                                    Manage your registered companies ({companies.length}/3)
-                                </CardDescription>
+                                <CardTitle className="text-2xl text-slate-950">My companies</CardTitle>
+                                <CardDescription className="mt-1 text-sm text-slate-600">Manage your registered companies ({companies.length}/3)</CardDescription>
                             </div>
                         </div>
-
 
                         <Button
                             onClick={() => setDialogOpen(true)}
-                            className="gap-2 bg-white text-blue-600 hover:bg-blue-50"
+                            className="gap-2 bg-slate-950 text-white hover:bg-slate-800"
                         >
                             <Plus size={18} />
-                            Add Company
+                            Add company
                         </Button>
-
                     </div>
                 </div>
 
-
-                {/* Companies */}
-                <div className="p-6">
-
+                <div className="p-6 sm:p-8">
                     {companies.length === 0 ? (
-
-                        <div className="flex flex-col items-center justify-center py-14 text-center">
-
-                            <div className="h-20 w-20 rounded-full bg-blue-100 flex items-center justify-center mb-5">
-                                <Building2
-                                    size={40}
-                                    className="text-blue-600"
-                                />
+                        <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-300 bg-slate-50/70 py-16 text-center">
+                            <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+                                <Building2 size={38} />
                             </div>
-
-                            <h2 className="text-xl font-semibold">
-                                No company added yet
-                            </h2>
-
-                            <p className="text-muted-foreground mt-2 max-w-md">
-                                Start building your company profile by adding your
-                                first company.
-                            </p>
-
-                            <Button
-                                onClick={() => setDialogOpen(true)}
-                                className="mt-5 gap-2"
-                            >
-                                <Plus size={18} />
-                                Add Company
-                            </Button>
-
+                            <h2 className="text-xl font-semibold text-slate-900">No company added yet</h2>
+                            <p className="mt-2 max-w-md text-sm leading-7 text-slate-500">Start building your company profile by adding your first company.</p>
+                            <Button onClick={() => setDialogOpen(true)} className="mt-6 gap-2"> <Plus size={18} /> Add company </Button>
                         </div>
-
-
                     ) : (
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-
+                        <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                             {companies.map((c) => (
-                                <div
-                                    key={c.company_id}
-                                    className="rounded-xl border p-5 hover:border-blue-500 transition-all bg-background"
-                                >
-
+                                <div key={c.company_id} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300">
                                     <div className="flex items-start gap-4">
-
-                                        <div className="h-20 w-20 rounded-xl overflow-hidden border shrink-0">
-                                            <img
-                                                src={c.logo}
-                                                alt={c.name}
-                                                className="h-full w-full object-cover"
-                                            />
+                                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                            <img src={c.logo} alt={c.name} className="h-full w-full object-cover" />
                                         </div>
-
 
                                         <div className="flex-1">
-
-                                            <h3 className="text-xl font-semibold">
-                                                {c.name}
-                                            </h3>
-
-                                            <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                                {c.description}
-                                            </p>
-
-
-                                            <a
-                                                href={c.website}
-                                                target="_blank"
-                                                className="text-blue-600 text-sm hover:underline mt-2 block"
-                                            >
+                                            <div className="flex items-center gap-2">
+                                                <h3 className="text-xl font-semibold text-slate-950">{c.name}</h3>
+                                                <div className='inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700'>
+                                                    <Sparkles size={12} />
+                                                    Live
+                                                </div>
+                                            </div>
+                                            <p className="mt-2 line-clamp-3 text-sm leading-7 text-slate-600">{c.description}</p>
+                                            <a href={c.website} target="_blank" className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline">
                                                 {c.website}
+                                                <ArrowUpRight size={14} />
                                             </a>
-
                                         </div>
-
                                     </div>
 
-
-                                    <div className="flex justify-end mt-5">
-
-
-                                        <Button
-                                            variant="outline"
-                                            className="gap-2"
-                                            onClick={() => router.push(`/company/${c.company_id}`)}
-                                        >
+                                    <div className="mt-6 flex flex-wrap justify-end gap-3">
+                                        <Button variant="outline" className="gap-2" onClick={() => router.push(`/company/${c.company_id}`)}>
                                             <Eye size={16} />
                                             View
                                         </Button>
 
-                                        <Button
-                                            variant="destructive"
-                                            className="gap-2"
-                                            onClick={() => {
-                                                if (confirm("Are you sure you want to delete this company?")) {
-                                                    deleteCompany(c.company_id)
-                                                }
-                                            }}
-                                        >
+                                        <Button variant="destructive" className="gap-2" onClick={() => {
+                                            if (confirm("Are you sure you want to delete this company?")) {
+                                                deleteCompany(c.company_id)
+                                            }
+                                        }}>
                                             <Trash2 size={16} />
                                             Delete
                                         </Button>
-
                                     </div>
-
-
                                 </div>
                             ))}
-
                         </div>
-
                     )}
-
                 </div>
-
             </Card>
 
-
-
-            {/* Add Company Dialog */}
-
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-
                 <DialogContent>
-
                     <DialogHeader>
-                        <DialogTitle>
-                            Add New Company
-                        </DialogTitle>
+                        <DialogTitle className='text-2xl'>Add new company</DialogTitle>
                     </DialogHeader>
 
-
                     <div className="space-y-4">
-
-
                         <input
-                            className="w-full border rounded-lg p-3"
-                            placeholder="Company Name"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
+                            placeholder="Company name"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                         />
 
-
                         <textarea
-                            className="w-full border rounded-lg p-3"
-                            placeholder="Company Description"
+                            className="min-h-28 w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
+                            placeholder="Company description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
 
-
                         <input
-                            className="w-full border rounded-lg p-3"
+                            className="w-full rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white"
                             placeholder="Website"
                             value={website}
                             onChange={(e) => setWebsite(e.target.value)}
                         />
 
-
-                        <label className="flex items-center gap-3 border rounded-lg p-3 cursor-pointer">
-
+                        <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700 transition hover:border-blue-300 hover:bg-white">
                             <UploadCloud size={20} />
-
-                            <span>
-                                Upload Logo
-                            </span>
-
-                            <input
-                                type="file"
-                                hidden
-                                accept="image/*"
-                                onChange={(e) =>
-                                    setLogo(e.target.files?.[0] || null)
-                                }
-                            />
-
+                            <span>{logo ? logo.name : 'Upload logo'}</span>
+                            <input type='file' hidden accept='image/*' onChange={(e) => setLogo(e.target.files?.[0] || null)} />
                         </label>
 
-
-                        <Button
-                            className="w-full"
-                            disabled={btnLoading}
-                            onClick={async () => {
-                                await addCompanyHandler();
-                                setDialogOpen(false);
-                            }}
-                        >
-                            {btnLoading ? "Adding..." : "Add Company"}
+                        <Button className="w-full" disabled={btnLoading} onClick={async () => {
+                            await addCompanyHandler();
+                            setDialogOpen(false);
+                        }}>
+                            {btnLoading ? 'Adding...' : 'Add company'}
                         </Button>
-
-
                     </div>
-
                 </DialogContent>
-
             </Dialog>
-
         </div>
     )
 }

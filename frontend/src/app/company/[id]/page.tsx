@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import toast from 'react-hot-toast';
 import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useAppData, job_service } from "@/context/AppContext";
-import { Company as CompanyType, Job } from "@/type";
+import { Application, Company as CompanyType, Job } from "@/type";
 import Loading from "@/components/loading";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -55,6 +56,10 @@ const CompanyPage = () => {
   const [isEditJobOpen, setIsEditJobOpen] = useState(false);
   const [isDeleteJobOpen, setIsDeleteJobOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [isApplicantsOpen, setIsApplicantsOpen] = useState(false);
+  const [applicants, setApplicants] = useState<Application[]>([]);
+  const [loadingApplicants, setLoadingApplicants] = useState(false);
+  const [applicantEdits, setApplicantEdits] = useState<Record<number, { status?: string; recruiter_note?: string; saving?: boolean }>>({});
 
   // Add Job Form State
   const [jobForm, setJobForm] = useState({
@@ -96,17 +101,13 @@ const CompanyPage = () => {
     );
   };
 
-  const fetchCompany = async () => {
+  const fetchCompany = useCallback(async () => {
     try {
       setLoading(true);
       const token = getAuthToken();
 
-      if (!token) return;
-
       const { data } = await axios.get(`${job_service}/api/job/company/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
       });
 
       setCompany(data);
@@ -119,17 +120,17 @@ const CompanyPage = () => {
         });
       }
     } catch (error) {
-      console.error("Error fetching company details:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to load this company" : "Unable to load this company");
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     if (id) {
       fetchCompany();
     }
-  }, [id]);
+  }, [fetchCompany]);
 
   // Handle Create Job
   const handleCreateJob = async (e: React.FormEvent) => {
@@ -145,7 +146,7 @@ const CompanyPage = () => {
         openings: Number(jobForm.openings),
       };
 
-      await axios.post(`${job_service}/api/job/new`, payload, {
+      const { data } = await axios.post(`${job_service}/api/job/new`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -162,10 +163,10 @@ const CompanyPage = () => {
         work_location: "Remote",
         openings: 1,
       });
-
-      fetchCompany();
+      toast.success(data?.message || "Job posted successfully");
+      await fetchCompany();
     } catch (error) {
-      console.error("Failed to create job:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to post the job" : "Unable to post the job");
     } finally {
       setBtnLoading(false);
     }
@@ -188,6 +189,52 @@ const CompanyPage = () => {
     setIsEditJobOpen(true);
   };
 
+  const openApplicantsModal = async (job: Job) => {
+    setSelectedJob(job);
+    setIsApplicantsOpen(true);
+    setLoadingApplicants(true);
+    try {
+      const token = getAuthToken();
+      const { data } = await axios.get(`${job_service}/api/job/application/${job.job_id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const apps = Array.isArray(data) ? data : [];
+      setApplicants(apps);
+      // initialize edits
+      const edits: Record<number, { status?: string; recruiter_note?: string; saving?: boolean }> = {};
+      apps.forEach((a: Application) => {
+        edits[a.application_id] = { status: a.status, recruiter_note: a.recruiter_note || '', saving: false };
+      });
+      setApplicantEdits(edits);
+    } catch (error) {
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to load applicants" : "Unable to load applicants");
+      setApplicants([]);
+    } finally {
+      setLoadingApplicants(false);
+    }
+  };
+
+  const saveApplicantUpdate = async (applicationId: number) => {
+    const edit = applicantEdits[applicationId];
+    if (!edit) return;
+    try {
+      setApplicantEdits((prev) => ({ ...prev, [applicationId]: { ...prev[applicationId], saving: true } }));
+      const token = getAuthToken();
+      const { data } = await axios.put(
+        `${job_service}/api/job/application/update/${applicationId}`,
+        { status: edit.status, recruiter_note: edit.recruiter_note },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      toast.success(data?.message || 'Applicant updated');
+      // refresh applicants
+      if (selectedJob) openApplicantsModal(selectedJob);
+    } catch (err) {
+      toast.error(axios.isAxiosError(err) ? err.response?.data?.message || "Failed to update applicant" : "Failed to update applicant");
+    } finally {
+      setApplicantEdits((prev) => ({ ...prev, [applicationId]: { ...prev[applicationId], saving: false } }));
+    }
+  };
+
   // Handle Update Job
   const handleUpdateJob = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,7 +250,7 @@ const CompanyPage = () => {
         openings: Number(editJobForm.openings),
       };
 
-      await axios.put(`${job_service}/api/job/${selectedJob.job_id}`, payload, {
+      const { data } = await axios.put(`${job_service}/api/job/${selectedJob.job_id}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -211,9 +258,10 @@ const CompanyPage = () => {
 
       setIsEditJobOpen(false);
       setSelectedJob(null);
-      fetchCompany();
+      toast.success(data?.message || "Job updated successfully");
+      await fetchCompany();
     } catch (error) {
-      console.error("Failed to update job:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to update the job" : "Unable to update the job");
     } finally {
       setBtnLoading(false);
     }
@@ -233,7 +281,7 @@ const CompanyPage = () => {
       setBtnLoading(true);
       const token = getAuthToken();
 
-      await axios.delete(`${job_service}/api/job/${selectedJob.job_id}`, {
+      const { data } = await axios.delete(`${job_service}/api/job/${selectedJob.job_id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -241,9 +289,10 @@ const CompanyPage = () => {
 
       setIsDeleteJobOpen(false);
       setSelectedJob(null);
-      fetchCompany();
+      toast.success(data?.message || "Job deleted successfully");
+      await fetchCompany();
     } catch (error) {
-      console.error("Failed to delete job:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to delete the job" : "Unable to delete the job");
     } finally {
       setBtnLoading(false);
     }
@@ -264,7 +313,7 @@ const CompanyPage = () => {
         formData.append("file", companyForm.logo);
       }
 
-      await axios.put(`${job_service}/api/job/company/${id}`, formData, {
+      const { data } = await axios.put(`${job_service}/api/job/company/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -272,9 +321,10 @@ const CompanyPage = () => {
       });
 
       setIsEditCompanyOpen(false);
-      fetchCompany();
+      toast.success(data?.message || "Company updated successfully");
+      await fetchCompany();
     } catch (error) {
-      console.error("Failed to update company:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to update the company" : "Unable to update the company");
     } finally {
       setBtnLoading(false);
     }
@@ -286,16 +336,17 @@ const CompanyPage = () => {
       setBtnLoading(true);
       const token = getAuthToken();
 
-      await axios.delete(`${job_service}/api/job/company/${id}`, {
+      const { data } = await axios.delete(`${job_service}/api/job/company/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
       setIsDeleteCompanyOpen(false);
-      router.push("/companies");
+      toast.success(data?.message || "Company deleted successfully");
+      router.push("/account");
     } catch (error) {
-      console.error("Failed to delete company:", error);
+      toast.error(axios.isAxiosError(error) ? error.response?.data?.message || "Unable to delete the company" : "Unable to delete the company");
     } finally {
       setBtnLoading(false);
     }
@@ -519,6 +570,14 @@ const CompanyPage = () => {
                               <Pencil size={16} />
                             </Button>
                             <Button
+                              onClick={() => openApplicantsModal(job)}
+                              variant="outline"
+                              size="sm"
+                              title="View Applicants"
+                            >
+                              Applicants
+                            </Button>
+                            <Button
                               onClick={() => openDeleteJobModal(job)}
                               variant="destructive"
                               size="icon"
@@ -703,6 +762,121 @@ const CompanyPage = () => {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* --- APPLICANTS MODAL --- */}
+      <Dialog open={isApplicantsOpen} onOpenChange={setIsApplicantsOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Applicants for {selectedJob?.title}</DialogTitle>
+            <DialogDescription>
+              List of applicants who applied for this job. Click resume to view.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {loadingApplicants ? (
+              <div className="text-sm text-muted-foreground">Loading applicants...</div>
+            ) : applicants.length === 0 ? (
+              <div className="text-sm text-muted-foreground">No applicants yet.</div>
+            ) : (
+              <div className="space-y-3">
+                {applicants.map((a) => (
+                  <div key={a.application_id} className="p-4 border rounded-lg bg-white shadow-sm">
+                    <div className="md:flex md:items-start md:justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-14 w-14 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden">
+                          {a.applicant_profile_pic ? (
+                            <img src={a.applicant_profile_pic} alt={a.applicant_name || 'Applicant'} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-lg font-semibold text-slate-700">{(a.applicant_name || a.applicant_email || 'U').charAt(0)}</span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">{a.applicant_name || a.applicant_email}</p>
+                          <p className="text-sm text-slate-600">{a.applicant_phone || 'Phone not provided'}</p>
+                          <p className="text-sm text-muted-foreground mt-1">{a.applicant_email}</p>
+                          <p className="text-xs text-slate-400 mt-1">Applied on {new Date(a.applied_at).toLocaleString()}</p>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 md:mt-0 md:w-1/2">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs text-muted-foreground">Job</span>
+                            <p className="font-medium">{a.job_title}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-xs text-muted-foreground">Subscription</span>
+                            <div className="mt-1 text-sm font-semibold">{a.subscribed ? 'Subscriber' : 'Free'}</div>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div>
+                            <label className="text-xs font-medium">Status</label>
+                            <select
+                              value={applicantEdits[a.application_id]?.status || a.status}
+                              onChange={(e) => setApplicantEdits((prev) => ({ ...prev, [a.application_id]: { ...prev[a.application_id], status: e.target.value } }))}
+                              className="w-full mt-1 rounded-md border px-2 py-1"
+                            >
+                              <option>Submitted</option>
+                              <option>In Review</option>
+                              <option>Shortlisted</option>
+                              <option>Interview</option>
+                              <option>Hired</option>
+                              <option>Rejected</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="text-xs font-medium">Resume</label>
+                            <div className="mt-1">
+                              <a href={a.resume} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-blue-600 hover:underline">
+                                View Resume
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+
+                        <label className="text-xs font-medium mt-3 block">Recruiter Note</label>
+                        <textarea
+                          value={applicantEdits[a.application_id]?.recruiter_note || a.recruiter_note || ''}
+                          onChange={(e) => setApplicantEdits((prev) => ({ ...prev, [a.application_id]: { ...prev[a.application_id], recruiter_note: e.target.value } }))}
+                          className="w-full mt-1 rounded-md border px-2 py-2 text-sm"
+                          rows={3}
+                        />
+
+                        <div className="mt-3 flex items-center justify-end gap-2">
+                          <Button
+                            onClick={() => {
+                              navigator.clipboard?.writeText(a.applicant_phone || '')
+                              toast.success('Phone copied to clipboard')
+                            }}
+                            variant="outline"
+                          >
+                            Copy Phone
+                          </Button>
+
+                          <Button
+                            onClick={() => saveApplicantUpdate(a.application_id)}
+                            disabled={applicantEdits[a.application_id]?.saving}
+                          >
+                            {applicantEdits[a.application_id]?.saving ? 'Saving...' : 'Save Changes'}
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsApplicantsOpen(false)}>Close</Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

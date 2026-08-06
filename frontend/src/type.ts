@@ -103,7 +103,7 @@ export interface Job {
   role: string;
   work_location: "On-site" | "Remote" | "Hybrid";
   company_id: number;
-  posted_by_recruiter_id: number;
+  company_name?: string;
   created_at: string;
   is_active: boolean;
 }
@@ -121,7 +121,7 @@ export interface Company {
   jobs:Job[];
 }
 
-type ApplicationStatus = "Submitted" | "Rejected" | "Hired";
+export type ApplicationStatus = "Submitted" | "In Review" | "Shortlisted" | "Interview" | "Rejected" | "Hired";
 
 export interface Application {
   application_id: number;
@@ -135,4 +135,8 @@ export interface Application {
   job_title: string;
   job_salary: number | null;
   job_location: string;
+  recruiter_note?: string;
+  applicant_name?: string;
+  applicant_phone?: string;
+  applicant_profile_pic?: string;
 }

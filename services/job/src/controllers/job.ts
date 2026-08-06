@@ -109,6 +109,62 @@ export const deleteCompany = TryCatch(async(req:AuthenticatedRequest, res) =>{
 
 })
 
+export const updateCompany = TryCatch(async(req: AuthenticatedRequest, res) => {
+    const user = req.user;
+    const { companyId } = req.params;
+
+    if(!user || user.role !== "recruiter"){
+        throw new ErrorHandler(403, "Only recruiters can update a company");
+    }
+
+    const [company] = await sql`SELECT * FROM companies WHERE company_id = ${companyId} AND recruiter_id = ${user.user_id}`;
+    if(!company){
+        throw new ErrorHandler(404, "Company not found or you are not authorized to update it");
+    }
+
+    const { name, description, website } = req.body || {};
+    if(!name?.trim() || !description?.trim() || !website?.trim()){
+        throw new ErrorHandler(400, "Name, description and website are required");
+    }
+
+    const duplicate = await sql`SELECT company_id FROM companies WHERE LOWER(name) = LOWER(${name.trim()}) AND company_id != ${companyId}`;
+    if(duplicate.length > 0){
+        throw new ErrorHandler(409, "A company with this name already exists");
+    }
+
+    let logo = company.logo;
+    let logoPublicId = company.logo_public_id;
+    if(req.file){
+        if(!process.env.UPLOAD_SERVICE){
+            throw new ErrorHandler(500, "Upload service is not configured");
+        }
+        const fileBuffer = getBuffer(req.file);
+        if(!fileBuffer?.content){
+            throw new ErrorHandler(500, "Failed to create the file buffer");
+        }
+        try {
+            const { data } = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, {
+                buffer: fileBuffer.content,
+                public_id: company.logo_public_id,
+            }, { timeout: 20000 });
+            if(!data?.url || !data?.public_id){
+                throw new Error("Upload service did not return a valid logo response");
+            }
+            logo = data.url;
+            logoPublicId = data.public_id;
+        } catch(error: any) {
+            throw new ErrorHandler(502, error?.response?.data?.message || error?.message || "Failed to upload company logo");
+        }
+    }
+
+    const [updatedCompany] = await sql`
+        UPDATE companies SET name = ${name.trim()}, description = ${description.trim()}, website = ${website.trim()}, logo = ${logo}, logo_public_id = ${logoPublicId}
+        WHERE company_id = ${companyId}
+        RETURNING *
+    `;
+    res.json({ message: "Company updated successfully", company: updatedCompany });
+})
+
 
 export const createJob = TryCatch(async(req:AuthenticatedRequest, res) => {
 
@@ -188,6 +244,24 @@ export const updateJob = TryCatch(async(req:AuthenticatedRequest, res) =>{
 
 })
 
+export const deleteJob = TryCatch(async(req: AuthenticatedRequest, res) => {
+    const user = req.user;
+    if(!user || user.role !== "recruiter"){
+        throw new ErrorHandler(403, "Only recruiters can delete a job");
+    }
+
+    const [job] = await sql`SELECT posted_by_recruiter_id FROM jobs WHERE job_id = ${req.params.jobId}`;
+    if(!job){
+        throw new ErrorHandler(404, "Job not found");
+    }
+    if(job.posted_by_recruiter_id !== user.user_id){
+        throw new ErrorHandler(403, "Forbidden: You are not allowed");
+    }
+
+    await sql`DELETE FROM jobs WHERE job_id = ${req.params.jobId}`;
+    res.json({ message: "Job deleted successfully" });
+})
+
 
 
 export const getAllCompany = TryCatch(async(req:AuthenticatedRequest, res)=>{
@@ -260,7 +334,14 @@ export const getAllActiveJobs = TryCatch(async (req, res) =>{
 
 
 export const getSingleJob = TryCatch(async(req, res) => {
-    const job = await sql`SELECT * FROM jobs WHERE job_id = ${req.params.jobId}`;
+    const [job] = await sql`
+        SELECT j.*, c.name AS company_name, c.logo AS company_logo, c.website AS company_website
+        FROM jobs j JOIN companies c ON c.company_id = j.company_id
+        WHERE j.job_id = ${req.params.jobId}
+    `;
+    if(!job){
+        throw new ErrorHandler(404, "Job not found");
+    }
     res.json(job);
 })
 
@@ -288,7 +369,14 @@ export const getAllApplicationForJob = TryCatch(async(req:AuthenticatedRequest, 
         throw new ErrorHandler(403, "Forbidden: You are not allowed");
     }
 
-    const applications = await sql`SELECT * FROM applications WHERE job_id = ${jobId} ORDER BY subscribed DESC, applied_at ASC`;
+    const applications = await sql`
+    SELECT a.*, j.title AS job_title, j.location AS job_location, j.salary AS job_salary,
+    u.name AS applicant_name, u.phone_number AS applicant_phone, u.profile_pic AS applicant_profile_pic
+    FROM applications a
+    JOIN jobs j ON j.job_id = a.job_id
+    LEFT JOIN users u ON a.applicant_id = u.user_id
+    WHERE a.job_id = ${jobId}
+    ORDER BY a.subscribed DESC, a.applied_at ASC`;
 
     res.json(applications);
 
@@ -327,7 +415,7 @@ export const updateApplication = TryCatch(async(req:AuthenticatedRequest, res) =
         throw new ErrorHandler(403, "Forbidden: You are not allowed");
     }
 
-    const [updatedApplication] = await sql`UPDATE applications SET status = ${req.body.status} WHERE application_id = ${id} RETURNING *`;
+    const [updatedApplication] = await sql`UPDATE applications SET status = ${req.body.status}, recruiter_note = ${req.body.recruiter_note} WHERE application_id = ${id} RETURNING *`;
 
     res.json({
         message: "Application Updated successfully",

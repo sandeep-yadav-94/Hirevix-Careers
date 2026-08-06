@@ -7,21 +7,26 @@ dotenv.config();
 
 async function initDB() {
     try {
-        await sql`
-        DO $$
-        BEGIN
-            if NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'job_type') THEN
-            CREATE TYPE job_type AS ENUM ('Full-time', 'Part-time', 'Contract', 'Internship');
-            END IF;
-            if NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'work_location') THEN
-            CREATE TYPE work_location AS ENUM ('On-site', 'Remote', 'Hybrid');
-            END IF;
-            if NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'application_status') THEN
-            CREATE TYPE application_status AS ENUM ('Submitted', 'Rejected', 'Hired');
-            END IF;
+        // Create enum types if they do not exist. Run each statement separately
+        const jobTypeExists = await sql`SELECT 1 FROM pg_type WHERE typname = 'job_type'`;
+        if ((jobTypeExists as any[]).length === 0) {
+            await sql`CREATE TYPE job_type AS ENUM ('Full-time', 'Part-time', 'Contract', 'Internship')`;
+        }
 
-        END$$;
-        `;
+        const workLocationExists = await sql`SELECT 1 FROM pg_type WHERE typname = 'work_location'`;
+        if ((workLocationExists as any[]).length === 0) {
+            await sql`CREATE TYPE work_location AS ENUM ('On-site', 'Remote', 'Hybrid')`;
+        }
+
+        const appStatusExists = await sql`SELECT 1 FROM pg_type WHERE typname = 'application_status'`;
+        if ((appStatusExists as any[]).length === 0) {
+            await sql`CREATE TYPE application_status AS ENUM ('Submitted', 'In Review', 'Shortlisted', 'Interview', 'Hired', 'Rejected')`;
+        } else {
+            // Try to add missing enum values one-by-one; ignore duplicate errors
+            try { await sql`ALTER TYPE application_status ADD VALUE 'In Review'`; } catch (e) { }
+            try { await sql`ALTER TYPE application_status ADD VALUE 'Shortlisted'`; } catch (e) { }
+            try { await sql`ALTER TYPE application_status ADD VALUE 'Interview'`; } catch (e) { }
+        }
 
         await sql`
         CREATE TABLE IF NOT EXISTS companies (
@@ -56,18 +61,21 @@ async function initDB() {
 
 
         await sql`
-CREATE TABLE IF NOT EXISTS applications (
-    application_id SERIAL PRIMARY KEY,
-    job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
-    applicant_id INTEGER NOT NULL,
-    applicant_email VARCHAR(255) NOT NULL,
-    status application_status NOT NULL DEFAULT 'Submitted',
-    resume VARCHAR(500) NOT NULL,
-    applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    subscribed BOOLEAN,
-    UNIQUE(job_id, applicant_id)
-);
-`;
+    CREATE TABLE IF NOT EXISTS applications (
+        application_id SERIAL PRIMARY KEY,
+        job_id INTEGER NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
+        applicant_id INTEGER NOT NULL,
+        applicant_email VARCHAR(255) NOT NULL,
+        status application_status NOT NULL DEFAULT 'Submitted',
+        resume VARCHAR(500) NOT NULL,
+        applied_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        subscribed BOOLEAN,
+        UNIQUE(job_id, applicant_id)
+    );
+    `;
+
+        // ensure recruiter_note column exists for storing recruiter comments
+        await sql`ALTER TABLE applications ADD COLUMN IF NOT EXISTS recruiter_note TEXT`;
 
         console.log("Job service Database tables checked and created successfully");
 

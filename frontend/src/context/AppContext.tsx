@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import toast, {Toaster} from 'react-hot-toast'
 import Cookies from "js-cookie";
 import axios from "axios";
-import { headers } from "next/headers";
 
 interface User {
     user_id: number;
@@ -46,6 +45,7 @@ export const utils_service = "http://localhost:4001";
 export const auth_service = "http://localhost:4000";
 export const user_service = "http://localhost:4002";
 export const job_service = "http://localhost:4003";
+export const payment_service = "http://localhost:4004";
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
