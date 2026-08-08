@@ -67,7 +67,7 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
         <Card className='overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_80px_-30px_rgba(2,6,23,0.25)]'>
           <div className='relative h-36 overflow-hidden bg-[linear-gradient(135deg,_#2563eb_0%,_#1d4ed8_50%,_#0f172a_100%)]'>
              <div className='absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.24),_transparent_42%)]' />
-             <div className='absolute -bottom-16 left-8 flex items-end gap-4 sm:left-10'>
+             <div className='absolute -bottom-0 left-8 flex items-end gap-4 sm:left-10'>
                 <div className='relative'>
                    <div className='h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-2xl sm:h-36 sm:w-36'>
                       <img src={user.profile_pic ? user.profile_pic : "/user-avatar.webp"} alt={user.name} className='h-full w-full object-cover'/>

@@ -65,6 +65,8 @@ import {
   Activity,
   type LucideIcon,
 } from "lucide-react";
+import { useRouter } from 'next/navigation';
+ 
 
 function Linkedin(props: React.SVGProps<SVGSVGElement>) {
   return (
@@ -126,34 +128,34 @@ const PARTICLES = Array.from({ length: 36 }).map((_, i) => ({
 }));
 
 const STATS: { label: string; value: number; suffix: string; icon: LucideIcon }[] = [
-  { label: "Active job seekers", value: 250000, suffix: "+", icon: Users },
-  { label: "Partner companies", value: 4200, suffix: "+", icon: Globe2 },
+  { label: "Active job seekers", value: 25000, suffix: "+", icon: Users },
+  { label: "Partner companies", value: 500, suffix: "+", icon: Globe2 },
   { label: "AI match accuracy", value: 96, suffix: "%", icon: Target },
-  { label: "Median time-to-hire", value: 9, suffix: " days", icon: Zap },
+  { label: "Median time-to-hire", value: 5, suffix: " days", icon: Zap },
 ];
 
 const TIMELINE = [
   { year: "2021", title: "Hirevix is founded", desc: "Three engineers and a hunch: hiring is a search problem, not a form problem." },
-  { year: "2022", title: "Matching engine v1 ships", desc: "Our first neural ranking model goes live, cutting screening time by 70%." },
+  { year: "2022", title: "Hirevix-Live is launched", desc: "Our first product of Hirevix Ecosystem is launched." },
   { year: "2023", title: "50,000 hires milestone", desc: "Enterprise customers join, and the model starts learning across industries." },
-  { year: "2024", title: "Series B & global expansion", desc: "Hirevix opens offices in three new regions and doubles its dataset." },
-  { year: "2025", title: "Hirevix Copilot launches", desc: "Conversational, AI-guided applications replace static resumes for good." },
-  { year: "2026", title: "1M+ candidates matched", desc: "A new benchmark for time-to-offer, set and held across every vertical." },
+  { year: "2024", title: "State and national expansion", desc: "Hirevix opens offices in three new regions and doubles its dataset." },
+  { year: "2025", title: "Hirevix Ecosystem launched", desc: "Conversational, AI-guided applications replace static resumes for good." },
+  { year: "2026", title: "1L+ candidates matched", desc: "A new benchmark for time-to-offer, set and held across every vertical." },
 ];
 
 const GROWTH_DATA = [
-  { month: "Jan", hires: 1200 },
-  { month: "Feb", hires: 1450 },
-  { month: "Mar", hires: 1620 },
-  { month: "Apr", hires: 1980 },
-  { month: "May", hires: 2340 },
-  { month: "Jun", hires: 2790 },
-  { month: "Jul", hires: 3210 },
-  { month: "Aug", hires: 3640 },
-  { month: "Sep", hires: 4120 },
-  { month: "Oct", hires: 4780 },
-  { month: "Nov", hires: 5390 },
-  { month: "Dec", hires: 6150 },
+  { month: "Jan", hires: 20 },
+  { month: "Feb", hires: 25 },
+  { month: "Mar", hires: 52 },
+  { month: "Apr", hires: 48 },
+  { month: "May", hires: 90 },
+  { month: "Jun", hires: 87 },
+  { month: "Jul", hires: 41 },
+  { month: "Aug", hires: 112 },
+  { month: "Sep", hires: 259 },
+  { month: "Oct", hires: 72 },
+  { month: "Nov", hires: 55 },
+  { month: "Dec", hires: 256 },
 ];
 
 const MATCH_DATA = [
@@ -209,12 +211,12 @@ const BENTO_FEATURES: { title: string; desc: string; icon: LucideIcon; className
 ];
 
 const TEAM = [
-  { name: "Ariana Kade", role: "Co-Founder & CEO", initials: "AK" },
-  { name: "Rohan Malhotra", role: "Co-Founder & CTO", initials: "RM" },
-  { name: "Sofia Duarte", role: "Head of AI Research", initials: "SD" },
-  { name: "Ethan Cole", role: "VP, Product", initials: "EC" },
-  { name: "Naomi Osei", role: "Head of Design", initials: "NO" },
-  { name: "Marcus Lin", role: "VP, Engineering", initials: "ML" },
+  { name: "Mr. Kuldeep Yadav", role: "Founder & CEO", initials: "KY" },
+  { name: "Sandeep Yadav", role: "Co-Founder & developer", initials: "SY" },
+  // { name: "Sofia Duarte", role: "Head of AI Research", initials: "SD" },
+  // { name: "Ethan Cole", role: "VP, Product", initials: "EC" },
+  // { name: "Naomi Osei", role: "Head of Design", initials: "NO" },
+  // { name: "Marcus Lin", role: "VP, Engineering", initials: "ML" },
 ];
 
 const TESTIMONIALS = [
@@ -382,8 +384,9 @@ function Hero() {
   };
 
   const words = "The AI hiring engine built to see people, not keywords.".split(" ");
-
+const router = useRouter();
   return (
+    
     <section
       onMouseMove={onMouseMove}
       className="relative flex min-h-[100svh] w-full flex-col items-center justify-center overflow-hidden bg-[#05060a] px-6"
@@ -432,9 +435,7 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.7 }}
           className="mt-7 max-w-xl text-balance text-base text-white/60 sm:text-lg font-[family-name:var(--font-body)]"
         >
-          Hirevix pairs a neural matching engine with real recruiters, turning
-          months of screening into days of signal — for every company and
-          every candidate on the platform.
+          We believe finding the right opportunity — or the right talent — should be simpler, faster, and more transparent. Our platform brings candidates and employers together through a streamlined hiring experience designed around skills, potential, and real career opportunities.
         </motion.p>
 
         <motion.div
@@ -443,14 +444,14 @@ function Hero() {
           transition={{ duration: 0.8, delay: 0.85 }}
           className="mt-10 flex flex-col items-center gap-4 sm:flex-row"
         >
-          <button className="group relative overflow-hidden rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform duration-300 hover:scale-[1.03]">
+          <button className="group relative overflow-hidden rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-black transition-transform duration-300 hover:scale-[1.03]" onClick={()=>router.push("/jobs")}>
             <span className="relative z-10 flex items-center gap-2">
-              Explore Hirevix <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              Find Jobs <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </span>
           </button>
-          <button className="rounded-full border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-medium text-white/80 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white">
+          {/* <button className="rounded-full border border-white/15 bg-white/[0.03] px-7 py-3.5 text-sm font-medium text-white/80 backdrop-blur-md transition-colors hover:border-white/30 hover:text-white">
             Meet the team
-          </button>
+          </button> */}
         </motion.div>
       </motion.div>
 
@@ -1048,12 +1049,12 @@ function CTA() {
               keywords — free to start, ready in minutes.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <button className="group rounded-full bg-white px-8 py-4 text-sm font-semibold text-black transition-transform duration-300 hover:scale-[1.03]">
+              {/* <button className="group rounded-full bg-white px-8 py-4 text-sm font-semibold text-black transition-transform duration-300 hover:scale-[1.03]" >
                 <span className="flex items-center gap-2">
                   Get started free
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </span>
-              </button>
+              </button> */}
               <button className="rounded-full border border-white/15 px-8 py-4 text-sm font-medium text-white/80 transition-colors hover:border-white/30 hover:text-white">
                 Talk to sales
               </button>
