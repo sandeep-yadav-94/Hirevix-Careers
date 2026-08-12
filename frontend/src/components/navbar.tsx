@@ -3,17 +3,18 @@
 import Link from "next/link";
 import React, { useState } from 'react'
 import { Button } from "./ui/button";
-import { Briefcase, Ghost, Home, Info, LogOut, Menu, User, UserIcon, X } from "lucide-react";
+import { Briefcase, Home, Info, LogOut, Menu, User, UserIcon, X } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { ModeToggle } from "./mode-toggle";
 import { useAppData } from "@/context/AppContext";
+import JobseekerNotifications from "./jobseeker-notifications";
 
 const NavBar = () => {
 
     const [isOpen, setIsOpen] = useState(false);
 
-    const {isAuth, user, setIsAuth, setUser, loading, logoutUser} = useAppData();
+    const {isAuth, user, loading, logoutUser} = useAppData();
 
     const toggleMenu = () => {
         setIsOpen(!isOpen);
@@ -90,10 +91,12 @@ const NavBar = () => {
                             </Link>
                         )}</>
                     }
+                        <JobseekerNotifications />
                         <ModeToggle/>
                 </div>
                {/* mobile menu butto  */}
                 <div className="md:hidden flex items-center gap-2">
+                    <JobseekerNotifications />
                     <ModeToggle/>
                     <button onClick={toggleMenu} className="p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500" aria-label="Toggle menu">
                         {isOpen ? (<X size={20} />) : (<Menu size={20} />)}
