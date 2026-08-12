@@ -9,6 +9,7 @@ Promise<any>): RequestHandler => async(req, res, next)=>{
         if(error instanceof ErrorHandler){
             return res.status(Number(error.statusCode)).json({
                 message: error.message,
+                ...(error.retryAfterSeconds ? { retryAfterSeconds: error.retryAfterSeconds } : {}),
             })
         }
         res.status(500).json({
