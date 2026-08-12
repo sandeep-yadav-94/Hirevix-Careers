@@ -13,6 +13,7 @@ app.post("/api/payment/webhook", express.raw({ type: "application/json" }), razo
 app.use(express.json());
 app.use("/api/payment", paymentRoutes);
 app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.get("/payment/health", (_req, res) => res.json({ status: "ok", service: "payment" }));
 
 async function initializeDatabase() {
   await sql`

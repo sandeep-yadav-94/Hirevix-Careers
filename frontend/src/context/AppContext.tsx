@@ -42,8 +42,8 @@ interface AppProviderProps {
 }
 
 export const utils_service = "http://localhost:4001";
-export const auth_service = "http://localhost:4000";
-export const user_service = "http://localhost:4002";
+export const auth_service = process.env.NEXT_PUBLIC_AUTH_SERVICE_URL || "http://localhost:4000";
+export const user_service = process.env.NEXT_PUBLIC_USER_SERVICE_URL || "http://localhost:4002";
 export const job_service = "http://localhost:4003";
 export const payment_service = "http://localhost:4004";
 

@@ -91,3 +91,11 @@ initDb().then(() => {
     console.log(`User service is running on http://localhost:${port}`);
   });
 });
+app.get('/user/health', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.json({ status: 'ok', service: 'user', serverTime: new Date().toISOString() });
+});
+app.get('/user/health', (_req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.json({ status: 'ok', service: 'user', serverTime: new Date().toISOString() });
+});
