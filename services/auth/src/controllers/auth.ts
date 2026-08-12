@@ -66,10 +66,21 @@ const registerUser = TryCatch(async (req, res) => {
       throw new ErrorHandler(500, 'Unable to create the user account.');
     }
 
+    // Generate JWT token for immediate login
+    const jwtSecret = process.env.JWT_SEC || process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new ErrorHandler(500, 'JWT secret is not configured on the server.');
+    }
+
+    const token = jwt.sign({ id: registeredUser.user_id }, jwtSecret, { expiresIn: '15d' });
+
+    // Return user data with token for immediate login
+    registeredUser.skills = registeredUser.skills || [];
     return res.status(201).json({
-      message: 'Registration successful. You can now log in.',
-      registerdUser: registeredUser,
-      email,
+      message: 'Registration successful. You are now logged in.',
+      user: registeredUser,
+      userObject: registeredUser,
+      token,
       requiresVerification: false,
     });
   } catch (error) {

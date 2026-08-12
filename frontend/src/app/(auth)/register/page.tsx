@@ -38,8 +38,15 @@ const RegisterPage = () => {
     try {
       const { data } = await axios.post(`${auth_service}/api/auth/register`, formData);
       toast.success(data?.message || 'Registration successful');
-      setUser(null);
-      setIsAuth(false);
+      
+      // Store the token and user immediately after registration
+      if (data?.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userEmail', email);
+      }
+      
+      setUser(data?.user || data?.userObject);
+      setIsAuth(true);
       router.replace('/');
     } catch (error: unknown) {
       toast.error(
@@ -47,8 +54,6 @@ const RegisterPage = () => {
           ? (error.response?.data?.message || error.message)
           : 'Registration failed. Please try again.'
       );
-      setUser(null);
-      setIsAuth(false);
     } finally {
       setBtnLoading(false);
     }
