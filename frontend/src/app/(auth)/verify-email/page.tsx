@@ -59,7 +59,12 @@ export default function VerifyEmailPage() {
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get('email');
     const retryAfterParam = Number(params.get('retryAfter') || 0);
-    setEmail(emailParam || '');
+    const storedEmail = typeof window !== 'undefined' ? window.sessionStorage.getItem('pending_verification_email') : null;
+    const resolvedEmail = emailParam || storedEmail || '';
+    if (typeof window !== 'undefined' && resolvedEmail) {
+      window.sessionStorage.setItem('pending_verification_email', resolvedEmail);
+    }
+    setEmail(resolvedEmail);
     setCooldownSeconds(retryAfterParam);
     inputRefs.current[0]?.focus();
   }, []);

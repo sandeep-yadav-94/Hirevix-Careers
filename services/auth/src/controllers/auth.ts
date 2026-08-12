@@ -254,53 +254,68 @@ const registerUser = TryCatch(async (req, res, next) => {
   const hashPassword = await bcrypt.hash(password, 10);
 
   let registerdUser;
+  let createdUserId: number | null = null;
 
-  if (role === "recruiter") {
-    const [user] = await sql`INSERT INTO users (name, email, password, phone_number, role, is_verified) VALUES (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, FALSE) RETURNING user_id, name, email, phone_number, role, created_at`;
-    registerdUser = user;
-  } else if (role === "jobseeker") {
-    const uploadedFiles = req.files as Record<string, Express.Multer.File[]> | undefined;
-    const file = uploadedFiles?.File?.[0] ?? uploadedFiles?.file?.[0] ?? uploadedFiles?.resume?.[0] ?? null;
+  try {
+    if (role === "recruiter") {
+      const [user] = await sql`INSERT INTO users (name, email, password, phone_number, role, is_verified) VALUES (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, FALSE) RETURNING user_id, name, email, phone_number, role, created_at`;
+      registerdUser = user;
+      createdUserId = user.user_id;
+    } else if (role === "jobseeker") {
+      const uploadedFiles = req.files as Record<string, Express.Multer.File[]> | undefined;
+      const file = uploadedFiles?.File?.[0] ?? uploadedFiles?.file?.[0] ?? uploadedFiles?.resume?.[0] ?? null;
 
-    if (!file) {
-      throw new ErrorHandler(400, "Resume file is required for job seekers...")
+      if (!file) {
+        throw new ErrorHandler(400, "Resume file is required for job seekers...")
+      }
+
+      const fileBuffer = getBuffer(file);
+
+      if (!fileBuffer || !fileBuffer.content) {
+        throw new ErrorHandler(500, "Failed to generate buffer of this file...")
+      }
+
+      let resumeUrl: string | null = null;
+      let resumePublicId: string | null = null;
+
+      if (process.env.UPLOAD_SERVICE) {
+        try {
+          const { data } = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, { buffer: fileBuffer.content });
+          resumeUrl = data?.url ?? null;
+          resumePublicId = data?.public_id ?? null;
+        } catch (uploadError) {
+          console.warn("Resume upload failed, continuing with registration:", uploadError);
+        }
+      }
+
+      const [user] = await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume, resume_public_id, is_verified) VALUES (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio}, ${resumeUrl}, ${resumePublicId}, FALSE) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
+      registerdUser = user;
+      createdUserId = user.user_id;
     }
 
-    const fileBuffer = getBuffer(file);
-
-    if (!fileBuffer || !fileBuffer.content) {
-      throw new ErrorHandler(500, "Failed to generate buffer of this file...")
+    if (!registerdUser) {
+      throw new ErrorHandler(500, 'Unable to create the user account.');
     }
 
-    let resumeUrl: string | null = null;
-    let resumePublicId: string | null = null;
+    await issueVerificationOtp(registerdUser.user_id, email);
 
-    if (process.env.UPLOAD_SERVICE) {
+    res.status(201).json({
+      message: 'Registration successful. Enter the OTP sent to your email.',
+      registerdUser,
+      email,
+      requiresVerification: true,
+    });
+  } catch (error) {
+    if (createdUserId) {
       try {
-        const { data } = await axios.post(`${process.env.UPLOAD_SERVICE}/api/utils/upload`, { buffer: fileBuffer.content });
-        resumeUrl = data?.url ?? null;
-        resumePublicId = data?.public_id ?? null;
-      } catch (uploadError) {
-        console.warn("Resume upload failed, continuing with registration:", uploadError);
+        await sql`DELETE FROM users WHERE user_id = ${createdUserId}`;
+        await sql`DELETE FROM email_verifications WHERE user_id = ${createdUserId}`;
+      } catch (cleanupError) {
+        console.error('Failed to clean up incomplete registration:', cleanupError);
       }
     }
-
-    const [user] = await sql`INSERT INTO users (name, email, password, phone_number, role, bio, resume, resume_public_id, is_verified) VALUES (${name}, ${email}, ${hashPassword}, ${phoneNumber}, ${role}, ${bio}, ${resumeUrl}, ${resumePublicId}, FALSE) RETURNING user_id, name, email, phone_number, role, bio, resume, created_at`;
-    registerdUser = user
+    throw error;
   }
-
-  if (!registerdUser) {
-    throw new ErrorHandler(500, 'Unable to create the user account.');
-  }
-
-  await issueVerificationOtp(registerdUser.user_id, email);
-
-  res.status(201).json({
-    message: 'Registration successful. Enter the OTP sent to your email.',
-    registerdUser,
-    email,
-    requiresVerification: true,
-  })
 })
 
 export const verifyEmailOtp = TryCatch(async (req, res, next) => {

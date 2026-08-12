@@ -8,7 +8,25 @@ import cors from 'cors';
 dotenv.config();
 
 const app = express();
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+  "http://localhost:3001",
+  "https://hirevix-careers.vercel.app",
+  "https://hirevix-careers-e389tbocm-sandeep-yadav-94s-projects.vercel.app",
+  "https://hirevix-careers-p3rsjjf7r-sandeep-yadav-94s-projects.vercel.app",
+];
+const vercelOriginRegex = /^https:\/\/[a-z0-9-]+\.vercel\.app$/;
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin) || vercelOriginRegex.test(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`Origin ${origin} is not allowed by CORS`));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 
