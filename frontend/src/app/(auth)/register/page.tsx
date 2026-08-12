@@ -20,15 +20,33 @@ const RegisterPage = () => {
   if (loading) return <Loading />;
 
   const submitHandler = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); setBtnLoading(true);
-    const formData = new FormData(); formData.append('role', role); formData.append('name', name); formData.append('email', email); formData.append('password', password); formData.append('phoneNumber', phoneNumber);
-    if (role === 'jobseeker') { formData.append('bio', bio); if (resume) formData.append('File', resume); }
+    event.preventDefault();
+    setBtnLoading(true);
+
+    const formData = new FormData();
+    formData.append('role', role);
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('phoneNumber', phoneNumber);
+
+    if (role === 'jobseeker') {
+      formData.append('bio', bio);
+      if (resume) formData.append('resume', resume);
+    }
+
     try {
       const { data } = await axios.post(`${auth_service}/api/auth/register`, formData);
       toast.success(data?.message || 'Registration successful');
-      router.push('/login');
+      setUser(null);
+      setIsAuth(false);
+      router.replace('/');
     } catch (error: unknown) {
-      toast.error(axios.isAxiosError(error) ? (error.response?.data?.message || error.message) : 'Registration failed. Please try again.');
+      toast.error(
+        axios.isAxiosError(error)
+          ? (error.response?.data?.message || error.message)
+          : 'Registration failed. Please try again.'
+      );
       setUser(null);
       setIsAuth(false);
     } finally {
@@ -45,7 +63,40 @@ const RegisterPage = () => {
           <form onSubmit={submitHandler} className="mt-7" noValidate>
             <div><p className="mb-3 text-sm font-medium text-white/75">I&apos;m here to</p><div className="grid grid-cols-2 gap-3"><button type="button" onClick={() => setRole('jobseeker')} className={`rounded-xl border p-3 text-left transition ${role === 'jobseeker' ? 'border-[#2fd8c4] bg-[#2fd8c4]/10 shadow-[0_0_0_3px_rgba(47,216,196,.1)]' : 'border-white/10 bg-white/[.03] hover:border-white/25'}`}><BriefcaseBusiness size={19} className={role === 'jobseeker' ? 'text-[#2fd8c4]' : 'text-white/45'} /><span className="mt-2 block text-sm font-semibold">Find a job</span><span className="mt-1 block text-xs text-white/40">For job seekers</span></button><button type="button" onClick={() => setRole('recruiter')} className={`rounded-xl border p-3 text-left transition ${role === 'recruiter' ? 'border-[#f2b33d] bg-[#f2b33d]/10 shadow-[0_0_0_3px_rgba(242,179,61,.1)]' : 'border-white/10 bg-white/[.03] hover:border-white/25'}`}><UserRound size={19} className={role === 'recruiter' ? 'text-[#f2b33d]' : 'text-white/45'} /><span className="mt-2 block text-sm font-semibold">Hire talent</span><span className="mt-1 block text-xs text-white/40">For recruiters</span></button></div></div>
             {role && <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-5 grid gap-4 sm:grid-cols-2"><label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium text-white/75">Full name</span><span className="relative block"><UserRound className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" size={18} /><input value={name} onChange={(event) => setName(event.target.value)} placeholder="Your full name" required className={fieldClass} /></span></label><label className="block"><span className="mb-2 block text-sm font-medium text-white/75">Email address</span><span className="relative block"><Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" size={18} /><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} placeholder="name@company.com" required autoComplete="email" className={fieldClass} /></span></label><label className="block"><span className="mb-2 block text-sm font-medium text-white/75">Phone number</span><span className="relative block"><Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" size={18} /><input type="number" value={phoneNumber} onChange={(event) => setPhoneNumber(event.target.value)} placeholder="+91 123456789" required className={fieldClass} /></span></label><label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium text-white/75">Password</span><span className="relative block"><LockKeyhole className="absolute left-4 top-1/2 -translate-y-1/2 text-white/35" size={18} /><input type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} placeholder="Create a secure password" required autoComplete="new-password" className={`${fieldClass} pr-12`} /><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((visible) => !visible)} className="absolute right-3 top-1/2 grid h-9 w-9 -translate-y-1/2 place-items-center rounded-lg text-white/45 transition hover:bg-white/10 hover:text-white">{showPassword ? <EyeOff size={18} /> : <Eye size={18} />}</button></span></label>
-              {role === 'jobseeker' && <><label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium text-white/75">Resume <span className="text-white/35">(PDF)</span></span><span className="relative flex h-[52px] items-center rounded-xl border border-dashed border-white/15 bg-white/[.035] px-4 transition hover:border-[#2fd8c4]/60"><FileText size={18} className="mr-3 text-[#2fd8c4]" /><span className="truncate text-sm text-white/50">{resume ? resume.name : 'Choose your resume PDF'}</span><input type="file" accept="application/pdf" onChange={(event: ChangeEvent<HTMLInputElement>) => setResume(event.target.files?.[0] || null)} required className="absolute inset-0 cursor-pointer opacity-0" /></span></label><label className="block sm:col-span-2"><span className="mb-2 block text-sm font-medium text-white/75">Short bio</span><textarea value={bio} onChange={(event) => setBio(event.target.value)} placeholder="Tell us a little about yourself" required rows={3} className="w-full resize-none rounded-xl border border-white/10 bg-white/[.045] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#2fd8c4] focus:bg-[#2fd8c4]/[.06] focus:ring-4 focus:ring-[#2fd8c4]/10" /></label></>}
+              {role === 'jobseeker' && (
+                <>
+                  <label className="block sm:col-span-2">
+                    <span className="mb-2 block text-sm font-medium text-white/75">
+                      Resume <span className="text-white/35">(PDF)</span>
+                    </span>
+                    <span className="relative flex min-h-[52px] w-full items-center rounded-xl border border-dashed border-white/15 bg-white/[.035] px-4 py-3 transition hover:border-[#2fd8c4]/60">
+                      <FileText size={18} className="mr-3 shrink-0 text-[#2fd8c4]" />
+                      <span className="truncate text-sm text-white/50">
+                        {resume ? resume.name : 'Choose your resume PDF'}
+                      </span>
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => setResume(event.target.files?.[0] || null)}
+                        required
+                        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                      />
+                    </span>
+                  </label>
+
+                  <label className="block sm:col-span-2">
+                    <span className="mb-2 block text-sm font-medium text-white/75">Short bio</span>
+                    <textarea
+                      value={bio}
+                      onChange={(event) => setBio(event.target.value)}
+                      placeholder="Tell us a little about yourself"
+                      required
+                      rows={3}
+                      className="w-full resize-none rounded-xl border border-white/10 bg-white/[.045] px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#2fd8c4] focus:bg-[#2fd8c4]/[.06] focus:ring-4 focus:ring-[#2fd8c4]/10"
+                    />
+                  </label>
+                </>
+              )}
               <button type="submit" disabled={btnLoading} className="sm:col-span-2 mt-1 flex h-[52px] w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#f2b33d] to-[#2fd8c4] px-5 text-sm font-bold text-slate-950 shadow-lg shadow-black/30 transition hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_rgba(242,179,61,.55)] active:scale-[.99] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0">{btnLoading ? <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/30 border-t-slate-900" /> : <>Create account <ArrowRight size={18} /></>}</button></motion.div>}
           </form><div className="mt-6 border-t border-white/10 pt-5 text-center text-sm text-white/45">Already have an account? <Link href="/login" className="font-semibold text-[#2fd8c4] transition hover:text-[#65ecdc]">Sign in</Link></div>
         </div>
