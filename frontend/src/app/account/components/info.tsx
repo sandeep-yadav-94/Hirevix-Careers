@@ -65,11 +65,11 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
   return (
     <div className='mx-auto max-w-5xl'>
         <Card className='overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_80px_-30px_rgba(2,6,23,0.25)]'>
-          <div className='relative h-36 overflow-hidden bg-[linear-gradient(135deg,_#2563eb_0%,_#1d4ed8_50%,_#0f172a_100%)]'>
+          <div className='relative h-28 overflow-hidden bg-[linear-gradient(135deg,_#2563eb_0%,_#1d4ed8_50%,_#0f172a_100%)] sm:h-36'>
              <div className='absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.24),_transparent_42%)]' />
-             <div className='absolute -bottom-0 left-8 flex items-end gap-4 sm:left-10'>
+             <div className='absolute -bottom-0 left-5 flex items-end gap-4 sm:left-10'>
                 <div className='relative'>
-                   <div className='h-32 w-32 overflow-hidden rounded-full border-4 border-white bg-white shadow-2xl sm:h-36 sm:w-36'>
+                   <div className='h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-white shadow-2xl sm:h-36 sm:w-36'>
                       <img src={user.profile_pic ? user.profile_pic : "/user-avatar.webp"} alt={user.name} className='h-full w-full object-cover'/>
                    </div>
 
@@ -91,12 +91,12 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
              </div>
           </div>
 
-          <div className='px-6 pb-8 pt-24 sm:px-8 sm:pt-24'>
+          <div className='px-4 pb-6 pt-16 sm:px-8 sm:pb-8 sm:pt-24'>
             <div className='flex flex-wrap items-start justify-between gap-4'>
                <div className='space-y-3'>
                   <div className='flex items-center gap-3'>
                      <div>
-                        <h1 className='text-3xl font-semibold tracking-tight text-slate-950'>{user.name}</h1>
+                        <h1 className='text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl'>{user.name}</h1>
                         <div className='mt-2 flex items-center gap-2 text-sm font-medium text-slate-600'>
                            <Briefcase size={16} className='text-blue-600' />
                            <span className='capitalize'>{user.role}</span>
@@ -114,7 +114,7 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
             </div>
 
             {user.role === 'jobseeker' && user.bio && (
-               <div className='mt-8 rounded-[24px] border border-slate-200 bg-slate-50/80 p-5'>
+               <div className='mt-6 rounded-[20px] border border-slate-200 bg-slate-50/80 p-4 sm:mt-8 sm:rounded-[24px] sm:p-5'>
                   <div className='mb-3 flex items-center gap-2 text-sm font-semibold text-slate-700'>
                      <FileText size={16} className='text-blue-600' />
                      <span>About</span>
@@ -123,7 +123,7 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
                </div>
             )}
 
-            <div className='mt-8'>
+            <div className='mt-6 sm:mt-8'>
                <h2 className='mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900'>
                   <Mail size={20} className='text-blue-600' />
                   Contact details
@@ -152,7 +152,7 @@ const Info: React.FC<AccountProps> = ({user, isYourAccount}) => {
             </div>
 
             {user.role === 'jobseeker' && user.resume && (
-               <div className='mt-8'>
+               <div className='mt-6 sm:mt-8'>
                   <h2 className='mb-4 flex items-center gap-2 text-lg font-semibold text-slate-900'>
                      <NotebookText size={20} className='text-blue-600' />
                      Resume

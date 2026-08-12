@@ -159,23 +159,23 @@ const Company = () => {
     if (loading) return <Loading />
 
     return (
-        <div className="mx-auto max-w-7xl px-4 py-2">
+        <div className="mx-auto max-w-7xl py-2 sm:px-4">
             <Card className="overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_80px_-30px_rgba(2,6,23,0.2)]">
-                <div className="border-b border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#f8fbff_100%)] p-6 sm:p-8">
+                <div className="border-b border-slate-200 bg-[linear-gradient(135deg,#eff6ff_0%,#f8fbff_100%)] p-4 sm:p-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                         <div className="flex items-center gap-3">
                             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-100 text-blue-600">
                                 <Building2 size={24} />
                             </div>
                             <div>
-                                <CardTitle className="text-2xl text-slate-950">My companies</CardTitle>
+                                <CardTitle className="text-xl text-slate-950 sm:text-2xl">My companies</CardTitle>
                                 <CardDescription className="mt-1 text-sm text-slate-600">Manage your registered companies ({companies.length}/3)</CardDescription>
                             </div>
                         </div>
 
                         <Button
                             onClick={() => setDialogOpen(true)}
-                            className="gap-2 bg-slate-950 text-white hover:bg-slate-800"
+                            className="w-full gap-2 bg-slate-950 text-white hover:bg-slate-800 sm:w-auto"
                         >
                             <Plus size={18} />
                             Add company
@@ -183,7 +183,7 @@ const Company = () => {
                     </div>
                 </div>
 
-                <div className="p-6 sm:p-8">
+                <div className="p-4 sm:p-8">
                     {companies.length === 0 ? (
                         <div className="flex flex-col items-center justify-center rounded-[24px] border border-dashed border-slate-300 bg-slate-50/70 py-16 text-center">
                             <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50 text-blue-600">
@@ -196,15 +196,15 @@ const Company = () => {
                     ) : (
                         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
                             {companies.map((c) => (
-                                <div key={c.company_id} className="rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300">
-                                    <div className="flex items-start gap-4">
-                                        <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50">
+                                <div key={c.company_id} className="rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 sm:rounded-[24px] sm:p-5">
+                                    <div className="flex items-start gap-3 sm:gap-4">
+                                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 sm:h-20 sm:w-20">
                                             <img src={c.logo} alt={c.name} className="h-full w-full object-cover" />
                                         </div>
 
                                         <div className="flex-1">
-                                            <div className="flex items-center gap-2">
-                                                <h3 className="text-xl font-semibold text-slate-950">{c.name}</h3>
+                                            <div className="flex flex-wrap items-center gap-2">
+                                                <h3 className="text-lg font-semibold text-slate-950 sm:text-xl">{c.name}</h3>
                                                 <div className='inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-emerald-700'>
                                                     <Sparkles size={12} />
                                                     Live

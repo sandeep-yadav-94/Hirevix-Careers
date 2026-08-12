@@ -120,15 +120,41 @@
 }
 
 @layer base {
+  html {
+    /* Keep typography stable across Android/iOS browsers and prevent iOS form zoom. */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border outline-ring/50;
+    min-width: 0;
     }
   body {
     @apply bg-background text-foreground;
+    min-height: 100dvh;
+    overflow-x: hidden;
     }
-  html {
-    @apply font-sans;
+
+  body, button, input, select, textarea {
+    font-family: inherit;
+  }
+
+  img, svg, video, canvas {
+    max-width: 100%;
+  }
+
+  input, select, textarea {
+    /* 16px prevents the unwanted viewport zoom on iPhones while editing. */
+    font-size: 16px !important;
+  }
+
+  @media (min-width: 768px) {
+    input, select, textarea {
+      font-size: inherit !important;
     }
+  }
 }
 
 .icon-style{

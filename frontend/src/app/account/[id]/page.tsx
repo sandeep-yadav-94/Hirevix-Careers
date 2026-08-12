@@ -42,7 +42,7 @@ const UserAccount = () => {
     if(loading) return <Loading/>
 
   return (
-        <>{ user && <div className='w-[90%] md:w-[60%] m-auto'>
+        <>{ user && <div className='mx-auto w-full max-w-5xl px-3 py-4 sm:px-6'>
             <Info user={user} isYourAccount={false}/>
              {
           user.role === "jobseeker" && <Skills user={user} isYourAccount={false}/>

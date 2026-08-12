@@ -31,7 +31,7 @@ const Hero = () => {
 
                      {/* description */}
 
-                     <p className="text-lg md:text-xl leading-relaxed opacity-80 max-w-2xl">
+                     <p className="max-w-2xl text-lg leading-relaxed opacity-80 md:text-xl">
                         More than a job portal—Hirevix Careers is the gateway to your professional future. Explore verified opportunities, showcase your talent, connect with trusted employers, and experience a smarter, faster, and more transparent hiring journey. Proudly built as the official career platform of the Hirevix Ecosystem.
                      </p>
 
@@ -70,7 +70,7 @@ const Hero = () => {
 
                      {/* trust indicators section */}
 
-                     <div className="flex items-center gap-2 text-sm opacity-60 pt-4">
+                     <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 pt-4 text-sm opacity-60 md:justify-start">
                         <span>✔️ Free to Use</span>
                         <span>•</span>
                         <span>🔒 Secure & Private</span>

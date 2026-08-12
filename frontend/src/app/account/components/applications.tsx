@@ -64,14 +64,14 @@ export default function AccountApplications() {
   return (
     <div className='mx-auto max-w-5xl'>
       <Toaster />
-      <div className='rounded-[28px] border border-slate-200/80 bg-white p-6 shadow-[0_24px_80px_-30px_rgba(2,6,23,0.2)] sm:p-8'>
+      <div className='rounded-[22px] border border-slate-200/80 bg-white p-4 shadow-[0_24px_80px_-30px_rgba(2,6,23,0.2)] sm:rounded-[28px] sm:p-8'>
         <div className='flex flex-col gap-4 border-b border-slate-200 pb-6 sm:flex-row sm:items-end sm:justify-between'>
           <div>
             <div className='inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-sm font-medium text-slate-600'>
               <Sparkles size={15} className='text-blue-600' />
               Application center
             </div>
-            <h2 className='mt-3 text-2xl font-semibold text-slate-950'>My applications & messages</h2>
+            <h2 className='mt-3 text-xl font-semibold text-slate-950 sm:text-2xl'>My applications & messages</h2>
             <p className='mt-2 text-sm leading-7 text-slate-600'>Stay on top of each step without losing context.</p>
           </div>
           <div className='rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600'>
@@ -104,7 +104,7 @@ export default function AccountApplications() {
           ) : (
             <div className='grid grid-cols-1 gap-4'>
               {applications.map((a) => (
-                <div key={a.application_id} className='rounded-[24px] border border-slate-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300'>
+                <div key={a.application_id} className='rounded-[20px] border border-slate-200 bg-white p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-blue-300 sm:rounded-[24px] sm:p-5'>
                   <div className='flex flex-col gap-4 md:flex-row md:items-start md:justify-between'>
                     <div className='space-y-2'>
                       <p className='text-lg font-semibold text-slate-900'>{a.job_title}</p>

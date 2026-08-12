@@ -34,7 +34,7 @@ const Skills:React.FC<AccountProps> = ({user, isYourAccount}) => {
   return (
     <div className='mx-auto max-w-5xl'>
         <Card className='overflow-hidden border border-slate-200/80 bg-white shadow-[0_24px_80px_-30px_rgba(2,6,23,0.2)]'>
-            <div className='border-b border-slate-200 bg-[linear-gradient(135deg,_#eff6ff_0%,_#f8fbff_100%)] p-6'>
+            <div className='border-b border-slate-200 bg-[linear-gradient(135deg,_#eff6ff_0%,_#f8fbff_100%)] p-4 sm:p-6'>
                 <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
                     <div className='flex items-center gap-3'>
                         <div className='flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-100 text-blue-600'>
@@ -53,11 +53,11 @@ const Skills:React.FC<AccountProps> = ({user, isYourAccount}) => {
             </div>
 
             {isYourAccount && (
-                <div className='border-b border-slate-200 bg-white/80 p-6'>
+                <div className='border-b border-slate-200 bg-white/80 p-4 sm:p-6'>
                     <div className='flex flex-col gap-3 sm:flex-row'>
                         <div className='relative flex-1'>
                             <Sparkle size={18} className='absolute left-3 top-1/2 -translate-y-1/2 text-slate-400'/>
-                            <Input type='text' placeholder='e.g. CCC, Tally, Excel...' className='h-11 bg-slate-50 pl-10' value={skill} onChange={e=>setSkill(e.target.value)} onKeyPress={handleKeyPress} />
+                            <Input type='text' placeholder='e.g. CCC, Tally, Excel...' className='h-11 bg-slate-50 pl-10 text-slate-900 placeholder:text-slate-500 dark:bg-slate-100 dark:text-slate-900 dark:placeholder:text-slate-500' value={skill} onChange={e=>setSkill(e.target.value)} onKeyPress={handleKeyPress} />
                         </div>
                         <Button onClick={addSkillHandler} className='h-11 gap-2 px-6' disabled={!skill.trim() || btnLoading}>
                             <Plus size={18} />
@@ -67,7 +67,7 @@ const Skills:React.FC<AccountProps> = ({user, isYourAccount}) => {
                 </div>
             )}
 
-            <CardContent className='p-6'>
+            <CardContent className='p-4 sm:p-6'>
               {user.skills?.length > 0 ? (
                 <div className='flex flex-wrap gap-2'>
                   {user.skills.map((skill, index) => (
@@ -101,7 +101,7 @@ const Skills:React.FC<AccountProps> = ({user, isYourAccount}) => {
                   ) : (
                     <>
                       <p className='text-base font-semibold text-slate-900'>No skills added</p>
-                      <p className='mt-1 text-sm text-slate-500'>This user hasn't added any skills yet.</p>
+                      <p className='mt-1 text-sm text-slate-500'>This user hasn&apos;t added any skills yet.</p>
                     </>
                   )}
                 </div>
