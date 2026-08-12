@@ -1,7 +1,7 @@
 "use client";
 
 import { ClipboardEvent, FormEvent, KeyboardEvent, useEffect, useRef, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import toast from 'react-hot-toast';
@@ -38,15 +38,14 @@ function formatClock(totalSeconds: number) {
 
 export default function VerifyEmailPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isAuth, setUser, setIsAuth } = useAppData();
-  const [email] = useState(searchParams.get('email') || '');
+  const [email, setEmail] = useState('');
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(''));
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [cooldownSeconds, setCooldownSeconds] = useState(() => Number(searchParams.get('retryAfter') || 0));
+  const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [expirySeconds, setExpirySeconds] = useState(EXPIRY_SECONDS);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
   const shakeControls = useAnimation();
@@ -57,6 +56,11 @@ export default function VerifyEmailPage() {
   }, [isAuth, router]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    const retryAfterParam = Number(params.get('retryAfter') || 0);
+    setEmail(emailParam || '');
+    setCooldownSeconds(retryAfterParam);
     inputRefs.current[0]?.focus();
   }, []);
 

@@ -1,8 +1,15 @@
-import type { NextConfig } from "next";
+/// <reference types="node" />
+// Minimal local NextConfig type to avoid needing external Next declarations
+type NextConfig = {
+  turbopack?: {
+    root?: string;
+  };
+  allowedDevOrigins?: string[];
+};
 
 const nextConfig: NextConfig = {
   turbopack: {
-    root: __dirname,
+    root: process.cwd(),
   },
   allowedDevOrigins: ['10.61.206.126'],
 };
