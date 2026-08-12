@@ -45,16 +45,6 @@ async function initDb() {
         await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN NOT NULL DEFAULT TRUE`;
 
         await sql`
-        CREATE TABLE IF NOT EXISTS email_verifications (
-            user_id INT PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
-            code_hash VARCHAR(64) NOT NULL,
-            expires_at TIMESTAMP NOT NULL,
-            attempts SMALLINT NOT NULL DEFAULT 0,
-            last_sent_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        )
-        `;
-
-        await sql`
         CREATE TABLE IF NOT EXISTS skills (
             skill_id SERIAL PRIMARY KEY,
             name VARCHAR(255) NOT NULL UNIQUE

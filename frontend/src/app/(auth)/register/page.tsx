@@ -25,13 +25,8 @@ const RegisterPage = () => {
     if (role === 'jobseeker') { formData.append('bio', bio); if (resume) formData.append('File', resume); }
     try {
       const { data } = await axios.post(`${auth_service}/api/auth/register`, formData);
-      toast.success(data?.message || 'Verification code sent');
-      const pendingEmail = data?.email || email;
-      if (typeof window !== 'undefined' && pendingEmail) {
-        window.sessionStorage.setItem('pending_verification_email', pendingEmail);
-      }
-      const retryAfterSeconds = Number(data?.retryAfterSeconds || 0);
-      router.push(`/verify-email?email=${encodeURIComponent(pendingEmail)}&retryAfter=${retryAfterSeconds}`);
+      toast.success(data?.message || 'Registration successful');
+      router.push('/login');
     } catch (error: unknown) {
       toast.error(axios.isAxiosError(error) ? (error.response?.data?.message || error.message) : 'Registration failed. Please try again.');
       setUser(null);
