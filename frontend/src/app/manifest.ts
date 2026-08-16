@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Hirevix Careers",
-    short_name: "Hirevix",
+    short_name: "Hirevix-Careers",
     description: "Find your next career opportunity with Hirevix.",
     start_url: "/",
     scope: "/",
